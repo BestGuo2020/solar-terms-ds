@@ -1,0 +1,47 @@
+{
+  "name": "solar-terms-ds",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "The 24 Solar Terms — an interactive Three.js guide to the Sun–Earth orbit, with English and Chinese editions and solar-term instants solved from real ephemerides",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BestGuo2020/solar-terms-ds.git"
+  },
+  "homepage": "https://github.com/BestGuo2020/solar-terms-ds#readme",
+  "keywords": [
+    "solar-terms",
+    "jieqi",
+    "二十四节气",
+    "threejs",
+    "astronomy",
+    "vsop87",
+    "vue"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "preview:dist": "node scripts/preview-dist.mjs",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "textures": "node scripts/fetch-textures.mjs",
+    "verify:astro": "tsc -p tsconfig.verify.json && node scripts/verify-astro.cjs",
+    "verify:browser": "node scripts/verify-browser.mjs",
+    "verify:mobile": "node scripts/verify-mobile.mjs",
+    "export:terms": "node scripts/export-terms.cjs",
+    "report:longterm": "node scripts/longterm-report.cjs"
+  },
+  "dependencies": {
+    "three": "^0.170.0",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "@types/three": "^0.170.0",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.7",
+    "vue-tsc": "^2.2.0"
+  }
+}
