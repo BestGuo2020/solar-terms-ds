@@ -2,32 +2,21 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2PMNQJPWBM"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-2PMNQJPWBM');
-    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#070a12" />
+    <meta name="theme-color" content="#050b12" />
     <meta
       name="description"
-      content="二十四节气互动科普：用 Three.js 呈现地球绕日公转的 3D 场景，直观展示节气、太阳黄经与季节变化的关系，并介绍二十四节气的历史渊源、文化价值与节气歌。"
+      content="观象 · 二十四节气：以可交互的日地公转三维场景，理解节气、太阳黄经与四季变化，并阅读二十四节气的历史、文化与节气歌。"
     />
-    <meta name="color-scheme" content="dark" />
-    <title>二十四节气 · 日地公转互动科普</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='7' fill='%23d8b271'/><ellipse cx='16' cy='16' rx='14' ry='6' fill='none' stroke='%234a86b8' stroke-width='1.2' transform='rotate(-20 16 16)'/><circle cx='27' cy='10' r='2.4' fill='%234a86b8'/></svg>" />
+    <meta property="og:title" content="观象 · 二十四节气" />
+    <meta property="og:description" content="太阳每走 15°，人间换一个节气。用 3D 日地公转看懂二十四节气。" />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>观象 · 二十四节气｜日地公转互动科普</title>
   </head>
   <body>
     <div id="app"></div>
-    <noscript>
-      <div style="padding: 2rem; color: #e9dfc9; font-family: sans-serif">
-        本页面的 3D 场景与交互需要启用 JavaScript。
-      </div>
-    </noscript>
-    <script type="module" src="/src/main.ts"></script>
+    <noscript>请启用 JavaScript 以查看日地公转互动场景。</noscript>
+    <script type="module" src="/src/entry.ts"></script>
   </body>
 </html>

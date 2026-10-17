@@ -1,38 +1,20 @@
 {
-  "name": "solar-terms-ds",
+  "name": "guanxiang-solar-terms",
   "private": true,
-  "version": "1.0.0",
+  "version": "4.1.0",
   "type": "module",
-  "description": "The 24 Solar Terms — an interactive Three.js guide to the Sun–Earth orbit, with English and Chinese editions and solar-term instants solved from real ephemerides",
+  "description": "观象 · 二十四节气：以 Three.js 日地公转场景呈现节气、太阳黄经与四季的中文互动科普网站",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/BestGuo2020/solar-terms-ds.git"
-  },
-  "homepage": "https://github.com/BestGuo2020/solar-terms-ds#readme",
-  "keywords": [
-    "solar-terms",
-    "jieqi",
-    "二十四节气",
-    "threejs",
-    "astronomy",
-    "vsop87",
-    "vue"
-  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "preview:dist": "node scripts/preview-dist.mjs",
+    "dev": "vite --host 127.0.0.1 --port 5183",
+    "build": "vue-tsc --noEmit -p tsconfig.json && vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4180",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
-    "textures": "node scripts/fetch-textures.mjs",
-    "verify:astro": "tsc -p tsconfig.verify.json && node scripts/verify-astro.cjs",
-    "verify:browser": "node scripts/verify-browser.mjs",
-    "verify:mobile": "node scripts/verify-mobile.mjs",
-    "export:terms": "node scripts/export-terms.cjs",
-    "report:longterm": "node scripts/longterm-report.cjs"
+    "verify:astro": "tsx scripts/verify-astro.mjs",
+    "verify:browser": "tsx scripts/verify-browser.mjs"
   },
   "dependencies": {
+    "astronomy-engine": "^2.1.19",
     "three": "^0.170.0",
     "vue": "^3.5.13"
   },
@@ -40,6 +22,7 @@
     "@types/node": "^26.6.4",
     "@types/three": "^0.170.0",
     "@vitejs/plugin-vue": "^5.2.1",
+    "tsx": "^4.23.15",
     "typescript": "^5.6.3",
     "vite": "^6.0.7",
     "vue-tsc": "^2.2.0"

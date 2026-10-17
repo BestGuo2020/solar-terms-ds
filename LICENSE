@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 BestGuo2020
+Copyright (c) 2026 观象 · 二十四节气 project
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,15 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-Note on third-party assets
---------------------------
-
-The MIT licence above covers the source code of this project.
-
-Planetary textures under `public/textures/` are **not** covered by it. They come
-from Solar System Scope (CC BY 4.0) and the three.js repository (MIT; base
-imagery from NASA public-domain data). See `public/textures/CREDITS.md` for the
-full list and the attribution requirements that apply if you redistribute them.

@@ -1,23 +1,11 @@
-﻿# 依赖与包管理器缓存
 node_modules/
-.npm-cache/
-.pnpm-store/
-.pnpm-home/
-
-# 构建产物
 dist/
-
-# 天文自检的中间产物（由 scripts/verify-astro.cjs 重新生成）
+shots/
 .verify/
-.verify-package.json
-
-# 无头浏览器调试用的临时配置目录（脚本每次运行都会新建一个 .edge-xxx-profile）
-.edge-*/
-
-# 系统与编辑器
+.npm-cache/
+.pnpm-home/
+*.local
+*.log
 .DS_Store
 Thumbs.db
-.idea/
-.vscode/*
-!.vscode/extensions.json
-*.log
+.vite/
