@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { useObservatory } from '../stores/observatory'
+import { useI18n } from '../i18n/index.ts'
+import { getLocalizedTermByIndex, getSeasonName } from '../i18n/content.ts'
+import type { MessageKey } from '../i18n/messages.ts'
 import {
   SolarSystemScene,
   type GuideToggles,
@@ -12,13 +15,14 @@ import {
 const emit = defineEmits<{ (event: 'select-term', termIndex: number): void }>()
 
 const store = useObservatory()
+const { locale, t } = useI18n()
 const {
   simMs,
   activeTerm,
-  seasonMeta,
   solarLongitude,
   orbitAngle,
   solarState,
+  seasonMeta,
   dateText,
   weekdayText,
   timeText,
@@ -27,22 +31,33 @@ const {
   selectedYear,
 } = store
 
+const localizedActiveTerm = computed(() =>
+  getLocalizedTermByIndex(activeTerm.value.index, locale.value),
+)
+const localizedSeasonName = computed(() =>
+  getSeasonName(activeTerm.value.season, locale.value),
+)
+
 const viewport = ref<HTMLDivElement | null>(null)
 const engine = shallowRef<SolarSystemScene | null>(null)
 const activeView = ref<ViewPreset>('default')
-const webglError = ref<string | null>(null)
+const webglError = ref(false)
 const contextLost = ref(false)
 const assetState = ref<SceneAssetState>({ loaded: 0, total: 7, failures: [] })
 const texturesSettled = ref(false)
-const qualityLabel = ref('自适应')
+const qualityTier = ref<'high' | 'low'>('high')
+
 const loadingLabel = computed(() => {
   if (!texturesSettled.value) {
     return assetState.value.loaded === 0
-      ? '正在准备地球影像'
-      : `正在载入纹理 ${assetState.value.loaded}/${assetState.value.total}`
+      ? t('scene.loadingPreparing')
+      : t('scene.loadingProgress', {
+          loaded: assetState.value.loaded,
+          total: assetState.value.total,
+        })
   }
-  if (assetState.value.failures.length > 0) return '部分纹理已使用替代材质'
-  return '观测台就绪'
+  if (assetState.value.failures.length > 0) return t('scene.loadingFallback')
+  return t('scene.loadingReady')
 })
 
 const guides = ref<GuideToggles>({
@@ -55,29 +70,34 @@ const guides = ref<GuideToggles>({
 
 const guideOptions: Array<{
   key: keyof GuideToggles
-  label: string
-  ariaLabel: string
+  labelKey: MessageKey
+  ariaKey: MessageKey
 }> = [
-  { key: 'axis', label: '地轴', ariaLabel: '显示或隐藏地轴、轨道法线及 23.4 度夹角' },
-  { key: 'equator', label: '赤道', ariaLabel: '显示或隐藏地球赤道' },
-  { key: 'tropics', label: '回归线', ariaLabel: '显示或隐藏南北回归线' },
-  { key: 'revolution', label: '公转方向', ariaLabel: '显示或隐藏地球公转方向箭头' },
-  { key: 'labels', label: '节气名', ariaLabel: '显示或隐藏轨道上的二十四节气名称' },
+  { key: 'axis', labelKey: 'scene.guide.axis', ariaKey: 'scene.guide.axisAria' },
+  { key: 'equator', labelKey: 'scene.guide.equator', ariaKey: 'scene.guide.equatorAria' },
+  { key: 'tropics', labelKey: 'scene.guide.tropics', ariaKey: 'scene.guide.tropicsAria' },
+  { key: 'revolution', labelKey: 'scene.guide.revolution', ariaKey: 'scene.guide.revolutionAria' },
+  { key: 'labels', labelKey: 'scene.guide.labels', ariaKey: 'scene.guide.labelsAria' },
 ]
 
-const viewOptions: Array<{ value: ViewPreset; label: string }> = [
-  { value: 'overview', label: '轨道总览' },
-  { value: 'earth', label: '地球近景' },
-  { value: 'default', label: '恢复默认视角' },
+const viewOptions: Array<{ value: ViewPreset; labelKey: MessageKey }> = [
+  { value: 'overview', labelKey: 'scene.viewOverview' },
+  { value: 'earth', labelKey: 'scene.viewEarth' },
+  { value: 'default', labelKey: 'scene.viewDefault' },
 ]
 
 const formattedLongitude = computed(() => solarLongitude.value.toFixed(2))
 const formattedOrbitAngle = computed(() => orbitAngle.value.toFixed(2))
 const formattedDeclination = computed(() => {
   const value = solarState.value.declination
-  const hemisphere = value >= 0 ? '北纬' : '南纬'
-  return `${hemisphere} ${Math.abs(value).toFixed(1)}°`
+  if (locale.value === 'en') {
+    return `${Math.abs(value).toFixed(1)}° ${value >= 0 ? 'N' : 'S'}`
+  }
+  return `${value >= 0 ? '北纬' : '南纬'} ${Math.abs(value).toFixed(1)}°`
 })
+const qualityLabel = computed(() =>
+  qualityTier.value === 'low' ? t('scene.qualityLow') : t('scene.qualityHigh'),
+)
 
 function setView(view: ViewPreset): void {
   activeView.value = view
@@ -134,12 +154,13 @@ onMounted(async () => {
       },
     })
     scene.setGuides(guides.value)
-    qualityLabel.value = scene.getSupportedQuality()
+    scene.setLocale(locale.value)
+    qualityTier.value = scene.quality.low ? 'low' : 'high'
     engine.value = scene
     document.addEventListener('visibilitychange', handleVisibilityChange)
   } catch (error) {
     console.error(error)
-    webglError.value = '当前浏览器未能初始化 WebGL 三维场景。你仍然可以使用下方时间轴与右侧节气详情。'
+    webglError.value = true
     texturesSettled.value = true
   }
 })
@@ -149,6 +170,10 @@ watch(
   (value) => engine.value?.setGuides(value),
   { deep: true },
 )
+
+watch(locale, (value) => {
+  engine.value?.setLocale(value)
+})
 
 onBeforeUnmount(() => {
   document.removeEventListener('visibilitychange', handleVisibilityChange)
@@ -176,23 +201,25 @@ onBeforeUnmount(() => {
 
       <div class="scene-hud scene-hud--top">
         <div class="scene-now">
-          <p class="scene-now__kicker">此刻，地球在轨道上</p>
+          <p class="scene-now__kicker">{{ t('scene.nowKicker') }}</p>
           <div class="scene-now__time">
             <time :datetime="new Date(simMs).toISOString()">{{ timeText }}</time>
-            <span class="scene-now__zone">北京时间 · UTC+8</span>
+            <span class="scene-now__zone">{{ t('scene.beijingTime') }}</span>
           </div>
           <p class="scene-now__date">{{ dateText }} · {{ weekdayText }}</p>
           <p class="scene-now__term">
-            <span :style="{ color: seasonMeta.color }">{{ activeTerm.name }}</span>
+            <span :style="{ color: seasonMeta.color }">{{ localizedActiveTerm.name }}</span>
             <span class="scene-now__divider">/</span>
-            <span>{{ seasonMeta.label }} · 太阳黄经 {{ formattedLongitude }}°</span>
+            <span>
+              {{ localizedSeasonName }}<span class="scene-now__longitude"> · {{ t('hero.sunLongitude', { lon: formattedLongitude }) }}</span>
+            </span>
           </p>
         </div>
 
         <div class="scene-status">
           <span class="status-badge" :class="isSimulated ? 'is-simulated' : 'is-live'">
             <i aria-hidden="true"></i>
-            {{ isSimulated ? '模拟时间' : '即时 · 实时' }}
+            {{ isSimulated ? t('scene.statusSimulated') : t('scene.statusLive') }}
           </span>
           <span v-if="isSimulated" class="scene-status__hint">{{ simulatedOffsetText }}</span>
         </div>
@@ -216,25 +243,25 @@ onBeforeUnmount(() => {
           <span class="scene-error__orbit"></span>
           <span class="scene-error__earth"></span>
         </div>
-        <h3>三维观测台未启动</h3>
-        <p>{{ webglError }}</p>
+        <h3>{{ t('scene.errorTitle') }}</h3>
+        <p>{{ t('scene.errorWebgl') }}</p>
       </div>
 
       <div v-if="contextLost" class="scene-error scene-error--small" role="alert">
-        <h3>图形上下文暂时中断</h3>
-        <p>浏览器已暂停三维渲染。刷新页面可以重新进入观测台。</p>
+        <h3>{{ t('scene.contextLostTitle') }}</h3>
+        <p>{{ t('scene.contextLostText') }}</p>
       </div>
 
-      <p class="scene-scale">尺寸与距离不按实际比例</p>
+      <p class="scene-scale">{{ t('scene.scale') }}</p>
       <p class="scene-instruction">
-        <span class="scene-instruction__mouse">拖动旋转 · 滚轮缩放 · 点按轨道光点查看节气 · 方向键也能转动视角</span>
-        <span class="scene-instruction__touch">单指旋转 · 双指缩放 · 点按光点或节气名查看</span>
+        <span class="scene-instruction__mouse">{{ t('scene.mouseHint') }}</span>
+        <span class="scene-instruction__touch">{{ t('scene.touchHint') }}</span>
       </p>
     </div>
 
     <div class="scene-toolbar">
-      <div class="view-presets" role="group" aria-label="相机视角">
-        <span class="toolbar-label">视角</span>
+      <div class="view-presets" role="group" :aria-label="t('scene.viewGroupAria')">
+        <span class="toolbar-label">{{ t('scene.viewLabel') }}</span>
         <button
           v-for="view in viewOptions"
           :key="view.value"
@@ -244,12 +271,12 @@ onBeforeUnmount(() => {
           :aria-pressed="activeView === view.value"
           @click="setView(view.value)"
         >
-          {{ view.label }}
+          {{ t(view.labelKey) }}
         </button>
       </div>
 
-      <div class="guide-toggles" role="group" aria-label="辅助标识">
-        <span class="toolbar-label">辅助</span>
+      <div class="guide-toggles" role="group" :aria-label="t('scene.guideGroupAria')">
+        <span class="toolbar-label">{{ t('scene.guideLabel') }}</span>
         <button
           v-for="guide in guideOptions"
           :key="guide.key"
@@ -257,40 +284,39 @@ onBeforeUnmount(() => {
           class="guide-toggle"
           :class="{ 'is-on': guides[guide.key] }"
           :aria-pressed="guides[guide.key]"
-          :aria-label="guide.ariaLabel"
-          :title="guide.ariaLabel"
+          :aria-label="t(guide.ariaKey)"
+          :title="t(guide.ariaKey)"
           @click="toggleGuide(guide.key)"
         >
           <span class="guide-toggle__mark" aria-hidden="true"></span>
-          {{ guide.label }}
+          {{ t(guide.labelKey) }}
         </button>
       </div>
     </div>
 
     <div class="coordinate-strip">
       <div class="coordinate-strip__item">
-        <span class="coordinate-strip__label">太阳地心视黄经</span>
+        <span class="coordinate-strip__label">{{ t('scene.coordSolar') }}</span>
         <strong>λ<sub>☉</sub> = {{ formattedLongitude }}°</strong>
       </div>
-      <span class="coordinate-strip__operator" aria-hidden="true">+ 180°</span>
+      <span class="coordinate-strip__operator" aria-hidden="true">{{ t('scene.coordFormula') }}</span>
       <div class="coordinate-strip__item">
-        <span class="coordinate-strip__label">地球轨道方位角</span>
+        <span class="coordinate-strip__label">{{ t('scene.coordOrbit') }}</span>
         <strong>φ<sub>⊕</sub> = {{ formattedOrbitAngle }}°</strong>
       </div>
       <p class="coordinate-strip__note">
-        从黄道北极俯视，黄经沿逆时针增大；地球在太阳的相反方向，所以轨道标记取
-        λ<sub>☉</sub> + 180°。太阳直射点：{{ formattedDeclination }}。图中天体与轨道为观感尺寸，
-        <span class="coordinate-strip__scale">尺寸与距离不按实际比例</span>。
+        {{ t('scene.coordNote', { declination: formattedDeclination }) }}
+        <span class="coordinate-strip__scale">{{ t('scene.coordScale') }}</span>
       </p>
     </div>
 
     <div class="scene-meta-row">
       <p class="scene-meta-row__hint">
         <span aria-hidden="true">◌</span>
-        轨道刻度按真实太阳黄经排布；下方滑块上的刻度来自当年实际交节时刻，并非等距。
-        <span class="scene-meta-row__tilt" :class="{ 'is-off': !guides.axis }">地轴与轨道法线约成 23.4°</span>
+        {{ t('scene.metaTicks') }}
+        <span class="scene-meta-row__tilt" :class="{ 'is-off': !guides.axis }">{{ t('scene.metaTilt') }}</span>
       </p>
-      <p class="scene-meta-row__quality">{{ qualityLabel }} · 隐藏页面时暂停渲染</p>
+      <p class="scene-meta-row__quality">{{ qualityLabel }}{{ t('scene.qualitySuffix') }}</p>
     </div>
   </div>
 </template>

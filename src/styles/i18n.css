@@ -1,0 +1,956 @@
+/* ─────────────────────────────────────────────
+   Bilingual layout and English typography
+   ───────────────────────────────────────────── */
+
+html.lang-en {
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Songti SC", "STSong", serif;
+  --sans: "Inter", "Segoe UI Variable", "Segoe UI", "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+html.lang-en body {
+  letter-spacing: 0;
+}
+
+/* Header */
+html.lang-en .brand-words strong {
+  font-size: 21px;
+  letter-spacing: 0.025em;
+}
+
+html.lang-en .brand-words small {
+  font-size: 8px;
+  letter-spacing: 0.1em;
+}
+
+html.lang-en .desktop-nav {
+  gap: clamp(12px, 1.55vw, 23px);
+}
+
+html.lang-en .desktop-nav a {
+  font-size: 11.5px;
+  letter-spacing: 0.015em;
+}
+
+html.lang-en .header-now {
+  min-width: 0;
+}
+
+html.lang-en .header-now__copy {
+  min-width: 0;
+}
+
+html.lang-en .header-now__copy strong {
+  max-width: 118px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+/* Hero */
+html.lang-en .hero-grid {
+  grid-template-columns: minmax(0, 1.28fr) minmax(260px, 0.52fr);
+  align-items: end;
+}
+
+html.lang-en .hero-copy h1 {
+  max-width: 900px;
+  font-size: clamp(40px, 4.15vw, 64px);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+html.lang-en .eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+}
+
+html.lang-en .hero-lede {
+  max-width: 690px;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+html.lang-en .hero-live {
+  max-width: 760px;
+  gap: 6px 9px;
+  font-size: 10.5px;
+  line-height: 1.55;
+}
+
+html.lang-en .hero-aside {
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 5px;
+  min-height: 0;
+}
+
+html.lang-en .hero-aside__ring {
+  width: min(225px, 19vw);
+  min-width: 185px;
+}
+
+html.lang-en .hero-aside__quote {
+  max-width: 275px;
+  color: var(--ink-soft);
+  font-family: var(--serif);
+  font-size: 12px;
+  letter-spacing: 0;
+  line-height: 1.55;
+  text-align: right;
+  writing-mode: horizontal-tb;
+}
+
+html.lang-en .hero-aside__source {
+  position: static;
+  margin-top: 0;
+  align-self: flex-end;
+  font-size: 8px;
+}
+
+html.lang-en .hero-aside__label {
+  font-size: 7.5px;
+  letter-spacing: 0.12em;
+  writing-mode: horizontal-tb;
+}
+
+/* Reading scroll and section headings */
+html.lang-en .scroll-cover h2 {
+  max-width: 900px;
+  font-size: clamp(44px, 4.8vw, 68px);
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+html.lang-en .scroll-cover__eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+}
+
+html.lang-en .scroll-cover__lede {
+  max-width: 630px;
+  font-size: 14px;
+  line-height: 1.85;
+}
+
+html.lang-en .scroll-cover__seasons span {
+  font-size: 17px;
+  letter-spacing: 0.02em;
+}
+
+html.lang-en .section-heading h2 {
+  font-size: clamp(31px, 3.25vw, 47px);
+  line-height: 1.18;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+html.lang-en .section-heading--split {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 55px);
+}
+
+html.lang-en .section-heading__aside p {
+  max-width: 580px;
+  font-size: 12.8px;
+  line-height: 1.85;
+}
+
+html.lang-en .section-kicker {
+  letter-spacing: 0.16em;
+}
+
+/* Orbit labels: English names are longer than two Han characters. To keep
+   the current term and the four seasonal turning points readable, we show
+   names for those five and leave all 24 light points as direct markers. */
+html.lang-en .orbit-label {
+  max-width: 170px;
+  padding: 3px 8px;
+  font-family: var(--sans);
+  font-size: 9.5px;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+html.lang-en .orbit-label.is-major {
+  padding: 3px 9px;
+  font-size: 10.5px;
+}
+
+html.lang-en .orbit-label:not(.is-major):not(.is-active) {
+  display: none !important;
+}
+
+html.lang-en .orbit-label.is-active {
+  font-size: 11px;
+}
+
+html.lang-en .scene-now__kicker {
+  letter-spacing: 0.14em;
+}
+
+html.lang-en .scene-now__term {
+  flex-wrap: wrap;
+  gap: 3px 6px;
+  font-size: 10px;
+}
+
+html.lang-en .scene-now__term > span:first-child {
+  font-size: 13px;
+  letter-spacing: 0.01em;
+}
+
+html.lang-en .scene-now__date {
+  font-size: 9.5px;
+}
+
+html.lang-en .scene-now__zone {
+  white-space: nowrap;
+}
+
+html.lang-en .scene-instruction {
+  max-width: 78%;
+  font-size: 8.5px;
+  line-height: 1.5;
+}
+
+html.lang-en .scene-loading {
+  max-width: 75%;
+  text-align: center;
+}
+
+html.lang-en .scene-toolbar {
+  gap: 7px 14px;
+}
+
+html.lang-en .toolbar-button,
+html.lang-en .guide-toggle {
+  letter-spacing: 0;
+}
+
+html.lang-en .coordinate-strip__note {
+  line-height: 1.6;
+}
+
+html.lang-en .scene-meta-row {
+  flex-wrap: wrap;
+}
+
+html.lang-en .scene-meta-row__hint {
+  flex: 1;
+}
+
+/* Term panel */
+html.lang-en .term-panel__heading h2 {
+  gap: 4px 8px;
+  font-size: clamp(25px, 2.4vw, 37px);
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+}
+
+html.lang-en .term-panel__pinyin {
+  flex-basis: 100%;
+  margin-top: 1px;
+  font-size: 10px;
+  letter-spacing: 0.01em;
+}
+
+html.lang-en .term-panel__overline {
+  font-size: 8px;
+  letter-spacing: 0.04em;
+}
+
+html.lang-en .term-panel__meta {
+  font-size: 9.5px;
+}
+
+html.lang-en .term-panel__longitude {
+  padding-left: 12px;
+}
+
+html.lang-en .term-panel__longitude > span {
+  letter-spacing: 0.04em;
+}
+
+html.lang-en .term-panel__scroll-cue {
+  font-size: 7.5px;
+  letter-spacing: 0;
+}
+
+html.lang-en .detail-section h3 {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+html.lang-en .detail-section h3 span {
+  font-size: 8px;
+  letter-spacing: 0;
+}
+
+html.lang-en .detail-section p {
+  font-size: 12.2px;
+  line-height: 1.76;
+}
+
+html.lang-en .detail-section--lead p {
+  font-size: 12.7px;
+}
+
+html.lang-en .timing-line__label {
+  flex-basis: 52px;
+  letter-spacing: 0;
+}
+
+html.lang-en .timing-line p {
+  font-size: 9.5px;
+}
+
+html.lang-en .timing-line p strong {
+  font-size: 11.5px;
+}
+
+html.lang-en .timing-progress,
+html.lang-en .term-panel__scroll-cue {
+  margin-left: 61px;
+}
+
+html.lang-en .term-panel__duration {
+  font-size: 8px;
+  line-height: 1.55;
+}
+
+html.lang-en .poem-card p {
+  font-size: 14px;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+}
+
+html.lang-en .poem-card__mark {
+  font-size: 29px;
+}
+
+html.lang-en .poem-card footer {
+  font-size: 8.5px;
+}
+
+html.lang-en .term-nav-button {
+  min-height: 40px;
+}
+
+html.lang-en .term-nav-button strong {
+  font-size: 10px;
+}
+
+html.lang-en .term-panel__scroll::-webkit-scrollbar {
+  width: 7px;
+}
+
+/* Time console */
+html.lang-en .console-title {
+  align-items: baseline;
+  gap: 8px;
+}
+
+html.lang-en .console-kicker {
+  font-size: 7px;
+  letter-spacing: 0.16em;
+  line-height: 1.3;
+  transform: none;
+  writing-mode: horizontal-tb;
+}
+
+html.lang-en .console-status {
+  font-size: 8.5px;
+  letter-spacing: 0;
+}
+
+html.lang-en .console-status__detail {
+  font-size: 7.5px;
+}
+
+html.lang-en .readout-time {
+  letter-spacing: 0;
+}
+
+html.lang-en .readout-date {
+  letter-spacing: 0.01em;
+}
+
+html.lang-en .readout-term__name {
+  font-size: clamp(21px, 2.15vw, 28px);
+  line-height: 1.14;
+  letter-spacing: 0;
+}
+
+html.lang-en .readout-term__timing {
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+html.lang-en .timeline-head {
+  flex-wrap: wrap;
+}
+
+html.lang-en .timeline-head__hint {
+  display: inline;
+  margin-left: 4px;
+  font-size: 8px;
+}
+
+html.lang-en .timeline-footer {
+  flex-wrap: wrap;
+  gap: 4px 15px;
+  font-size: 8px;
+}
+
+html.lang-en .timeline-footer p:last-child {
+  flex: 0 0 auto;
+  font-size: 7.5px;
+}
+
+html.lang-en .jump-button {
+  font-size: 8.5px;
+}
+
+html.lang-en .speed-button {
+  font-size: 8px;
+}
+
+/* Term wheel */
+html.lang-en .term-group {
+  grid-template-columns: 154px minmax(0, 1fr);
+}
+
+html.lang-en .term-group__label h3 {
+  font-size: 15px;
+  letter-spacing: 0.01em;
+}
+
+html.lang-en .term-group__label p {
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+html.lang-en .term-card {
+  min-height: 132px;
+  padding: 11px 11px 13px;
+}
+
+html.lang-en .term-card__name {
+  font-size: 17px;
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+html.lang-en .term-card__pinyin {
+  margin-top: 3px;
+  font-size: 7.5px;
+  line-height: 1.4;
+}
+
+html.lang-en .term-card__date {
+  padding-top: 8px;
+  font-size: 7.5px;
+}
+
+html.lang-en .term-card__now {
+  padding: 1px 4px;
+  font-size: 6.5px;
+}
+
+html.lang-en .term-card__major {
+  top: auto;
+  right: 7px;
+  bottom: 7px;
+  font-family: var(--sans);
+  font-size: 6.5px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  writing-mode: horizontal-tb;
+}
+
+/* History */
+html.lang-en .history-card__head h3 {
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+html.lang-en .history-card__era {
+  letter-spacing: 0.12em;
+}
+
+html.lang-en .history-card__year {
+  max-width: 120px;
+  font-family: var(--sans);
+  font-size: 8.5px;
+  line-height: 1.5;
+  white-space: normal;
+}
+
+html.lang-en .history-card__detail {
+  font-size: 11.8px;
+  line-height: 1.8;
+}
+
+html.lang-en .history-caveat {
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+/* Culture */
+html.lang-en .culture-card h3 {
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+html.lang-en .culture-card__summary {
+  font-size: 12.2px;
+  line-height: 1.8;
+}
+
+html.lang-en .culture-card__examples li {
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+html.lang-en .culture-quote blockquote {
+  font-size: clamp(17px, 1.7vw, 21px);
+  line-height: 1.75;
+}
+
+/* Song */
+html.lang-en .song-language-note {
+  max-width: 920px;
+  margin: -18px auto 22px;
+  padding: 10px 14px;
+  border-left: 1px solid rgba(89, 69, 39, 0.3);
+  color: #82745f;
+  font-size: 10.5px;
+  line-height: 1.7;
+}
+
+html.lang-en .song-line__season {
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+
+html.lang-en .song-line__summary {
+  min-height: 66px;
+  font-size: 10.5px;
+  line-height: 1.75;
+}
+
+html.lang-en .song-line__terms {
+  font-size: 9px;
+  line-height: 1.7;
+}
+
+html.lang-en .song-hint__mark {
+  width: auto;
+  min-width: 28px;
+  padding-inline: 5px;
+}
+
+html.lang-en .song-hint p {
+  font-size: 10.3px;
+}
+
+html.lang-en .song-notes h3 {
+  font-size: 16px;
+}
+
+html.lang-en .song-notes p {
+  font-size: 10.5px;
+}
+
+/* Science */
+html.lang-en .faq-question > span:nth-child(2) {
+  font-size: clamp(18px, 1.75vw, 21px);
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+html.lang-en .faq-answer p {
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+html.lang-en .faq-answer li {
+  font-size: 9.8px;
+  line-height: 1.7;
+}
+
+html.lang-en .science-diagram .diagram-label {
+  font-size: 8px;
+  letter-spacing: 0.02em;
+}
+
+html.lang-en .science-diagram .diagram-note {
+  font-size: 7px;
+  letter-spacing: 0;
+}
+
+html.lang-en .science-live-data dt,
+html.lang-en .science-live-data dd {
+  font-size: 9px;
+}
+
+/* Sources */
+html.lang-en .method-card p {
+  font-size: 11.5px;
+  line-height: 1.85;
+}
+
+html.lang-en .source-title {
+  font-family: var(--sans);
+  font-size: 11.8px;
+  line-height: 1.6;
+  letter-spacing: 0.005em;
+}
+
+html.lang-en .source-publisher {
+  font-size: 9.3px;
+}
+
+html.lang-en .source-note {
+  font-size: 9.2px;
+}
+
+html.lang-en .data-caveats li {
+  font-size: 9.8px;
+}
+
+html.lang-en .sources-signoff {
+  font-size: clamp(16px, 1.6vw, 20px);
+}
+
+html.lang-en .texture-credits p {
+  font-size: 9.5px;
+}
+
+.texture-credits__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 3px 8px;
+  margin-top: 7px;
+}
+
+.texture-credits__links span {
+  color: var(--ink-faint);
+}
+
+/* Footer */
+html.lang-en .footer-brand h2 {
+  font-size: clamp(25px, 2.2vw, 33px);
+  letter-spacing: 0;
+}
+
+html.lang-en .footer-brand p:last-child {
+  max-width: 490px;
+  font-size: 12.3px;
+  line-height: 1.8;
+}
+
+html.lang-en .footer-columns a {
+  font-size: 11.5px;
+}
+
+html.lang-en .site-footer__bottom {
+  font-size: 9.5px;
+  line-height: 1.75;
+}
+
+@media (max-width: 1180px) {
+  html.lang-en .desktop-nav {
+    font-size: 11px;
+    gap: 12px;
+  }
+
+  html.lang-en .header-now {
+    display: none;
+  }
+}
+
+@media (max-width: 980px) {
+  html.lang-en .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  html.lang-en .hero-aside {
+    display: none;
+  }
+
+  html.lang-en .hero-copy h1 {
+    font-size: clamp(37px, 6.3vw, 58px);
+  }
+
+  html.lang-en .hero-lede {
+    max-width: 760px;
+  }
+
+  html.lang-en .section-heading--split {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  html.lang-en .section-heading h2 {
+    font-size: clamp(30px, 5.2vw, 43px);
+  }
+
+  html.lang-en .section-heading__aside p {
+    max-width: 720px;
+    font-size: 12.5px;
+  }
+
+  html.lang-en .term-group {
+    grid-template-columns: 1fr;
+  }
+
+  html.lang-en .term-group__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  html.lang-en .history-card__head h3 {
+    font-size: 17px;
+  }
+
+  html.lang-en .scroll-cover h2 {
+    font-size: clamp(40px, 7vw, 58px);
+  }
+}
+
+@media (max-width: 760px) {
+  html.lang-en .brand-words strong {
+    font-size: 19px;
+  }
+
+  html.lang-en .brand-words small {
+    font-size: 7.5px;
+    letter-spacing: 0.06em;
+  }
+
+  html.lang-en .lang-button {
+    min-width: 27px;
+    height: 27px;
+    font-size: 8.5px;
+  }
+
+  html.lang-en .hero-copy h1 {
+    font-size: clamp(34px, 8.6vw, 48px);
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+  }
+
+  html.lang-en .hero-lede {
+    font-size: 12.8px;
+    line-height: 1.75;
+  }
+
+  html.lang-en .hero-live {
+    font-size: 9.8px;
+    line-height: 1.5;
+  }
+
+  html.lang-en .section-heading h2 {
+    font-size: clamp(27px, 7.1vw, 37px);
+  }
+
+  html.lang-en .section-heading__aside p {
+    font-size: 11.2px;
+    line-height: 1.8;
+  }
+
+  html.lang-en .scroll-cover h2 {
+    font-size: clamp(37px, 9.4vw, 50px);
+  }
+
+  html.lang-en .scroll-cover__lede {
+    font-size: 12px;
+    line-height: 1.85;
+  }
+
+  html.lang-en .scroll-cover__seasons span {
+    font-size: 14px;
+  }
+
+  html.lang-en .orbit-label {
+    max-width: 140px;
+    padding: 2px 6px;
+    font-size: 9px;
+  }
+
+  html.lang-en .orbit-label.is-major,
+  html.lang-en .orbit-label.is-active {
+    font-size: 9.5px;
+  }
+
+  html.lang-en .scene-now__term {
+    font-size: 9px;
+  }
+
+  html.lang-en .scene-now__term > span:first-child {
+    font-size: 12px;
+  }
+
+  html.lang-en .scene-instruction {
+    max-width: 100%;
+    font-size: 8px;
+  }
+
+  html.lang-en .scene-toolbar {
+    gap: 5px 10px;
+  }
+
+  html.lang-en .term-panel__heading h2 {
+    font-size: 29px;
+  }
+
+  html.lang-en .term-panel__pinyin {
+    font-size: 9px;
+  }
+
+  html.lang-en .detail-section p,
+  html.lang-en .detail-section--lead p {
+    font-size: 12px;
+    line-height: 1.75;
+  }
+
+  html.lang-en .term-group__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  html.lang-en .term-card {
+    min-height: 118px;
+    padding: 9px;
+  }
+
+  html.lang-en .term-card__name {
+    font-size: 15.5px;
+  }
+
+  html.lang-en .term-card__pinyin {
+    font-size: 7px;
+  }
+
+  html.lang-en .term-card__date {
+    font-size: 7px;
+  }
+
+  html.lang-en .term-card__major {
+    display: none;
+  }
+
+  html.lang-en .history-card__head h3 {
+    font-size: 17px;
+  }
+
+  html.lang-en .history-card__detail {
+    font-size: 11px;
+  }
+
+  html.lang-en .culture-card h3 {
+    font-size: 21px;
+  }
+
+  html.lang-en .faq-question > span:nth-child(2) {
+    font-size: 16.5px;
+  }
+
+  html.lang-en .faq-answer p {
+    font-size: 11.2px;
+  }
+
+  html.lang-en .readout-term__name {
+    font-size: 24px;
+  }
+
+  html.lang-en .readout-term__timing {
+    font-size: 9px;
+  }
+
+  html.lang-en .timeline-footer {
+    font-size: 8px;
+  }
+
+  html.lang-en .timeline-head__hint {
+    display: block;
+    margin-left: 0;
+    margin-top: 2px;
+  }
+
+  html.lang-en .song-line__summary {
+    min-height: 0;
+  }
+
+  html.lang-en .method-card p {
+    font-size: 10.8px;
+  }
+
+  html.lang-en .source-title {
+    font-size: 11.5px;
+  }
+
+  html.lang-en .data-caveats li {
+    font-size: 9.5px;
+  }
+}
+
+@media (max-width: 520px) {
+  html.lang-en .term-group__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html.lang-en .term-card {
+    min-height: 113px;
+  }
+
+  html.lang-en .term-card__name {
+    font-size: 15px;
+  }
+
+  html.lang-en .orbit-label {
+    max-width: 120px;
+    font-size: 8.5px;
+  }
+
+  html.lang-en .orbit-label.is-active,
+  html.lang-en .orbit-label.is-major {
+    font-size: 9px;
+  }
+
+  html.lang-en .coordinate-strip__note {
+    font-size: 8.2px;
+  }
+
+  html.lang-en .song-line__season {
+    font-size: 14px;
+  }
+
+  html.lang-en .footer-brand h2 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 380px) {
+  html.lang-en .brand-words small {
+    max-width: 112px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  html.lang-en .hero-copy h1 {
+    font-size: 33px;
+  }
+
+  html.lang-en .orbit-label {
+    max-width: 108px;
+  }
+}

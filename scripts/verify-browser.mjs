@@ -4,6 +4,8 @@ import path from 'node:path'
 import os from 'node:os'
 import { activeTermAt, termInstantInYear } from '../src/astro/solar-terms.ts'
 import { fromBeijing } from '../src/astro/beijing-time.ts'
+import { SOLAR_TERMS } from '../src/data/term-catalog.ts'
+import { TERM_NAMES_EN } from '../src/data/en/term-labels.ts'
 
 const EDGE = process.env.EDGE_PATH ?? 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
 const PORT = 9336
@@ -408,6 +410,58 @@ async function main() {
   const creditsStatus = await evaluate(`fetch('/textures/CREDITS.md').then((response) => response.status)`)
   assertEqualNumber(creditsStatus, 200, '纹理署名文件可访问')
 
+  console.log('\n英语界面')
+  const simBeforeLanguage = Number((await stageData())?.simMs)
+  await click('.lang-switch button[aria-label="English"]')
+  await sleep(500)
+  const englishState = await evaluate(`(() => {
+    const visible = [...document.querySelectorAll('.orbit-label')]
+      .filter((element) => getComputedStyle(element).display !== 'none')
+    return {
+      lang: document.documentElement.lang,
+      title: document.title,
+      url: location.search,
+      stored: localStorage.getItem('guanxiang.locale'),
+      h1: document.querySelector('h1')?.textContent?.trim() ?? '',
+      nav: document.querySelector('.desktop-nav')?.textContent?.trim() ?? '',
+      detail: document.querySelector('.term-panel h2')?.textContent?.trim() ?? '',
+      detailText: document.querySelector('.term-panel')?.innerText ?? '',
+      readout: document.querySelector('.readout-date')?.textContent?.trim() ?? '',
+      speed: document.querySelector('.speed-control')?.textContent?.trim() ?? '',
+      visibleLabels: visible.map((element) => element.textContent?.trim() ?? ''),
+      orbitAria: [...document.querySelectorAll('.orbit-label')]
+        .filter((element) => (element.getAttribute('aria-label') ?? '').includes('solar longitude')).length,
+      firstCard: document.querySelector('.term-card .term-card__name')?.textContent?.trim() ?? '',
+      sourceGroup: document.querySelector('.source-group h3')?.textContent?.trim() ?? '',
+      simMs: document.querySelector('.scene-viewport')?.dataset.simMs,
+    }
+  })()`)
+  assertEqualString(englishState.lang, 'en', '语言开关将 html lang 切换为英语')
+  assert(englishState.title.includes('Guanxiang · The 24 Solar Terms'), '英语页面标题已本地化')
+  assert(englishState.url.includes('lang=en'), '英语状态写入可分享的 URL 参数')
+  assertEqualString(englishState.stored, 'en', '英语偏好写入 localStorage')
+  assert(englishState.h1.includes('The sun travels 15'), '英语首屏主标题已翻译')
+  assert(englishState.nav.includes('Observatory') && englishState.nav.includes('Year Wheel'), '英语导航已翻译')
+  assert(englishState.detail.includes('Spring Equinox'), '英语节气详情显示英文节气名')
+  assert(englishState.detailText.includes('Name & meaning'), '英语节气详情正文已翻译')
+  assert(englishState.readout.includes('March'), '英语时间读数使用英文月份')
+  assert(englishState.speed.includes('1 day/s'), '英语时间速度控件已翻译')
+  assert(englishState.visibleLabels.includes('Spring Equinox'), '轨道显示英文的分至标签')
+  assert(englishState.visibleLabels.length >= 4, '英语轨道保留当前节气与四个分至的可读标签')
+  assertEqualNumber(englishState.orbitAria, 24, '全部 24 个轨道标记的无障碍名称切换为英语')
+  assertEqualString(englishState.firstCard, 'Beginning of Spring', '岁时谱首张卡片显示英文节气名')
+  assertEqualString(englishState.sourceGroup, 'Calendar & astronomy', '英语来源分类已翻译')
+  assertEqualNumber(Number(englishState.simMs), simBeforeLanguage, '切换语言不会重置模拟时间')
+  await evaluate('scrollTo(0, 0)')
+  await sleep(300)
+  await capture('verify-en.png')
+  await click('.lang-switch button[aria-label="中文"]')
+  await sleep(400)
+  assertEqualString(await evaluate(`document.documentElement.lang`), 'zh-CN', '语言开关可切回中文')
+  assertEqualString(await evaluate(`localStorage.getItem('guanxiang.locale')`), 'zh', '切回中文后同步保存偏好')
+  assert(!((await evaluate(`location.search`)) ?? '').includes('lang=en'), '切回中文后移除英语 URL 参数')
+  assert((await evaluate(`document.querySelector('.term-panel h2')?.textContent ?? ''`)).includes('春分'), '切回中文后详情恢复中文')
+
   console.log('\n移动端布局')
   await send('Emulation.setDeviceMetricsOverride', {
     width: 390,
@@ -456,6 +510,99 @@ async function main() {
   await capture('verify-mobile.png')
   await scrollTo('.time-console', -66)
   await capture('verify-mobile-time.png')
+
+  console.log('\n英语移动端')
+  await click('.lang-switch button[aria-label="English"]')
+  await sleep(500)
+  const mobileEnglish = await evaluate(`(() => {
+    const viewport = document.querySelector('.scene-viewport')
+    const activeIndex = Number(viewport?.dataset.activeTermIndex)
+    const visibleLabels = [...document.querySelectorAll('.orbit-label')]
+      .filter((element) => getComputedStyle(element).display !== 'none')
+      .map((element) => element.textContent?.trim() ?? '')
+    return {
+      lang: document.documentElement.lang,
+      activeIndex,
+      detail: document.querySelector('.term-panel h2')?.textContent?.trim() ?? '',
+      detailText: document.querySelector('.term-panel')?.innerText ?? '',
+      visibleLabels,
+      width: innerWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      menu: getComputedStyle(document.querySelector('.menu-toggle')).display,
+      language: getComputedStyle(document.querySelector('.lang-switch')).display,
+      timeText: document.querySelector('.time-console')?.innerText ?? '',
+      timeOverflow: document.querySelector('.time-console')?.scrollWidth > document.querySelector('.time-console')?.clientWidth,
+      cards: document.querySelectorAll('.term-card').length,
+    }
+  })()`)
+  assertEqualString(mobileEnglish.lang, 'en', '移动端语言开关可切换到英语')
+  assertEqualNumber(mobileEnglish.width, 390, '英语移动端 CSS 视口为 390px')
+  assertEqualNumber(mobileEnglish.scrollWidth, 390, '英语移动端没有横向溢出')
+  const expectedMobileTerm = TERM_NAMES_EN[mobileEnglish.activeIndex] ?? ''
+  assertEqualString(mobileEnglish.menu, 'block', '英语移动端保留菜单按钮')
+  assertEqualString(mobileEnglish.language, 'flex', '英语移动端显示语言开关')
+  assert(mobileEnglish.detail.includes(expectedMobileTerm), '英语移动端详情显示对应的英文节气')
+  assert(mobileEnglish.detailText.includes('Name & meaning'), '英语移动端详情正文保持英文')
+  assert(mobileEnglish.visibleLabels.includes(expectedMobileTerm), '英语移动端轨道显示当前节气名')
+  assert(mobileEnglish.visibleLabels.length >= 4, '英语移动端保留当前节气与分至标签')
+  assert(mobileEnglish.timeText.includes('Time controls') && mobileEnglish.timeText.includes('Play'), '英语移动端时间控件已翻译')
+  assert(!mobileEnglish.timeOverflow, '英语移动端时间控制没有横向溢出')
+  assertEqualNumber(mobileEnglish.cards, 24, '英语移动端岁时谱仍列出 24 个节气')
+  await scrollTo('.scene-card', -66)
+  await sleep(350)
+  await capture('verify-mobile-en.png')
+  await click('.lang-switch button[aria-label="中文"]')
+  await sleep(400)
+  assertEqualString(await evaluate(`document.documentElement.lang`), 'zh-CN', '英语移动端可切回中文')
+  assertEqualString(await evaluate(`localStorage.getItem('guanxiang.locale')`), 'zh', '移动端切回中文后保存偏好')
+
+  console.log('\n平板布局')
+  await send('Emulation.setDeviceMetricsOverride', {
+    width: 768,
+    height: 1024,
+    deviceScaleFactor: 1,
+    mobile: true,
+  })
+  await send('Page.reload', { ignoreCache: true })
+  await sleep(4200)
+  const tablet = await evaluate(`(() => {
+    const stage = document.querySelector('.scene-card')?.getBoundingClientRect()
+    const panel = document.querySelector('.term-panel')?.getBoundingClientRect()
+    return {
+      width: innerWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      desktopNav: getComputedStyle(document.querySelector('.desktop-nav')).display,
+      menu: getComputedStyle(document.querySelector('.menu-toggle')).display,
+      language: getComputedStyle(document.querySelector('.lang-switch')).display,
+      stageBottom: stage?.bottom,
+      panelTop: panel?.top,
+    }
+  })()`)
+  assertEqualNumber(tablet.width, 768, '平板 CSS 视口为 768px')
+  assertEqualNumber(tablet.scrollWidth, 768, '平板没有横向溢出')
+  assertEqualString(tablet.desktopNav, 'none', '平板隐藏桌面导航')
+  assertEqualString(tablet.menu, 'block', '平板显示菜单按钮')
+  assertEqualString(tablet.language, 'flex', '平板显示语言开关')
+  assert(Number(tablet.panelTop) >= Number(tablet.stageBottom) - 1, '平板详情区排在 3D 场景下方')
+  await click('.lang-switch button[aria-label="English"]')
+  await sleep(500)
+  assertEqualString(await evaluate(`document.documentElement.lang`), 'en', '平板可切换到英语')
+  const tabletEnglish = await evaluate(`(() => ({
+    h1: document.querySelector('h1')?.textContent?.trim() ?? '',
+    scrollWidth: document.documentElement.scrollWidth,
+    card: document.querySelector('.term-card .term-card__name')?.textContent?.trim() ?? '',
+    detail: document.querySelector('.term-panel h2')?.textContent?.trim() ?? '',
+  }))()`)
+  assert(tabletEnglish.h1.includes('The sun travels 15'), '平板英语首屏标题正确')
+  assertEqualNumber(tabletEnglish.scrollWidth, 768, '平板英语界面没有横向溢出')
+  assertEqualString(tabletEnglish.card, 'Beginning of Spring', '平板英语岁时谱名称正确')
+  assert(tabletEnglish.detail.length > 0, '平板英语详情内容可用')
+  await scrollTo('.scene-card', -66)
+  await sleep(350)
+  await capture('verify-tablet-en.png')
+  await click('.lang-switch button[aria-label="中文"]')
+  await sleep(400)
+  assertEqualString(await evaluate(`document.documentElement.lang`), 'zh-CN', '平板可切回中文')
 
   console.log('\n控制台错误检查')
   const realErrors = consoleErrors.filter(

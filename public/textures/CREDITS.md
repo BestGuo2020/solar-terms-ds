@@ -15,3 +15,22 @@
 
 Solar System Scope 纹理以 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 授权。
 二次分发本项目时，请保留本文件与页面页脚中的署名。
+
+## English
+
+The runtime textures in `public/textures/` are listed below. If a file fails to load,
+the 3D scene falls back to a procedurally generated texture and shows a notice instead
+of a blank view.
+
+| File | Content | Source | Licence |
+| --- | --- | --- | --- |
+| `earth_day.jpg` | Earth daytime surface | [Solar System Scope](https://www.solarsystemscope.com/textures/) `2k_earth_daymap.jpg` | CC BY 4.0 |
+| `earth_night.jpg` | Earth night side / city lights | [Solar System Scope](https://www.solarsystemscope.com/textures/) `2k_earth_nightmap.jpg` | CC BY 4.0 |
+| `earth_clouds.jpg` | Cloud layer | [Solar System Scope](https://www.solarsystemscope.com/textures/) `2k_earth_clouds.jpg` | CC BY 4.0 |
+| `sun.jpg` | Solar surface | [Solar System Scope](https://www.solarsystemscope.com/textures/) `2k_sun.jpg` | CC BY 4.0 |
+| `stars_milkyway.jpg` | Milky Way background | [Solar System Scope](https://www.solarsystemscope.com/textures/) `2k_stars_milky_way.jpg` | CC BY 4.0 |
+| `earth_normal.jpg` | Earth normal map | [three.js examples](https://github.com/mrdoob/three.js/tree/dev/examples/textures/planets), based on NASA public imagery | MIT |
+| `earth_specular.jpg` | Land/ocean specular mask | [three.js examples](https://github.com/mrdoob/three.js/tree/dev/examples/textures/planets), based on NASA public imagery | MIT |
+
+Solar System Scope textures are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+If you redistribute this project, keep this file and the attribution in the page footer.

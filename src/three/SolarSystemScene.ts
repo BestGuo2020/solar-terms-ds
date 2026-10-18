@@ -2,6 +2,8 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { SEASON_META, SOLAR_TERMS } from '../data/term-catalog.ts'
 import type { Season } from '../data/types.ts'
+import type { Locale } from '../i18n/types.ts'
+import { getTermName } from '../i18n/content.ts'
 import {
   AXIAL_TILT_RAD,
   DEG_TO_RAD,
@@ -945,6 +947,42 @@ export class SolarSystemScene {
     this.applyGuides()
   }
 
+  /**
+   * 切换场景内文字：轨道节气标签、太阳/地球标签与画布说明。
+   * 只更新文本，不重建场景，切换语言时相机和模拟时间都不会丢失。
+   */
+  setLocale(locale: Locale): void {
+    const english = locale === 'en'
+    this.labelLayer.setAttribute(
+      'aria-label',
+      english ? 'Solar-term markers on the orbit' : '二十四节气轨道标记',
+    )
+    for (const term of SOLAR_TERMS) {
+      const button = this.labelElements.get(term.index)
+      if (!button) continue
+      const fullName = getTermName(term.index, locale)
+      const nameElement = button.querySelector<HTMLElement>('.orbit-label__name')
+      if (nameElement) nameElement.textContent = fullName
+      button.title = english
+        ? `${fullName} · solar longitude ${term.longitude}° · open the term instant`
+        : `${fullName} · 太阳黄经 ${term.longitude}° · 点击前往交节时刻`
+      button.setAttribute(
+        'aria-label',
+        english
+          ? `${fullName}, solar longitude ${term.longitude} degrees. Jump to this term in the selected year.`
+          : `${fullName}，太阳黄经 ${term.longitude} 度，点击跳转到所选年份的交节时刻`,
+      )
+    }
+    this.sunLabel.textContent = english ? 'Sun' : '太阳'
+    this.earthLabel.textContent = english ? 'Earth · now' : '地球 · 此刻'
+    this.renderer.domElement.setAttribute(
+      'aria-label',
+      english
+        ? 'Interactive 3D Sun–Earth orbit scene. Drag with a mouse or one finger to rotate, scroll or pinch to zoom. When focused, arrow keys rotate and Home restores the default view.'
+        : '三维日地公转场景。鼠标拖动或单指滑动旋转视角，滚轮或双指捏合缩放；聚焦后可用方向键旋转，Home 键恢复默认视角。',
+    )
+  }
+
   private applyGuides(): void {
     const earthView = this.viewMode === 'earth'
     this.axisGroup.visible = this.guides.axis
@@ -1165,8 +1203,14 @@ export class SolarSystemScene {
         const outward = 18 + (term.index % 2 === 0 ? 2 : 5)
         x += (dx / length) * outward
         y += (dy / length) * outward + (term.index % 2 === 0 ? -1 : 3)
-        x = Math.min(width - 26, Math.max(26, x))
-        y = Math.min(height - 18, Math.max(18, y))
+        // 标签以自身中心定位。英文名称比两个汉字宽得多，必须按实际宽度
+        // 收进舞台内，否则手机上的“Spring Equinox”等会被画面边缘裁掉。
+        const labelWidth = element.offsetWidth
+        const labelHeight = element.offsetHeight
+        const halfWidth = Math.min(labelWidth / 2, width / 2 - 10)
+        const halfHeight = Math.min(labelHeight / 2, height / 2 - 10)
+        x = Math.min(width - halfWidth - 10, Math.max(halfWidth + 10, x))
+        y = Math.min(height - halfHeight - 44, Math.max(halfHeight + 20, y))
         element.style.display = ''
         element.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(-50%, -50%)`
       }
@@ -1251,10 +1295,6 @@ export class SolarSystemScene {
 
   getTextureProgress(): TextureProgress | null {
     return this.textureProgress
-  }
-
-  getSupportedQuality(): string {
-    return this.quality.low ? '自适应 · 流畅' : '自适应 · 精细'
   }
 
   dispose(): void {

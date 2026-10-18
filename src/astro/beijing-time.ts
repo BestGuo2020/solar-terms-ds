@@ -6,9 +6,20 @@
  * 场景与界面内部的 Unix 时间始终是 UTC，仅在显示与输入时转换为北京时间。
  */
 
+import type { Locale } from '../i18n/types.ts'
+
 export const BEIJING_OFFSET_MS = 8 * 60 * 60 * 1000
 export const DAY_MS = 86_400_000
-const WEEKDAYS = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'] as const
+const WEEKDAYS_ZH = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'] as const
+const WEEKDAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const
+const MONTHS_EN = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+] as const
+const MONTHS_EN_SHORT = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+] as const
 
 export interface BeijingParts {
   year: number
@@ -62,18 +73,23 @@ export function endOfBeijingYear(year: number): number {
   return fromBeijing(year, 12, 31, 23, 59, 59) + 999
 }
 
-export function formatDateCN(ms: number): string {
+export function formatDateCN(ms: number, locale: Locale = 'zh'): string {
   const p = beijingParts(ms)
+  if (locale === 'en') return `${p.day} ${MONTHS_EN[p.month - 1]} ${p.year}`
   return `${p.year}年${p.month}月${p.day}日`
 }
 
-export function formatDateWithWeekday(ms: number): string {
+export function formatDateWithWeekday(ms: number, locale: Locale = 'zh'): string {
   const p = beijingParts(ms)
-  return `${p.year}年${p.month}月${p.day}日 ${WEEKDAYS[p.weekday]}`
+  if (locale === 'en') {
+    return `${p.day} ${MONTHS_EN[p.month - 1]} ${p.year} · ${WEEKDAYS_EN[p.weekday]}`
+  }
+  return `${p.year}年${p.month}月${p.day}日 ${WEEKDAYS_ZH[p.weekday]}`
 }
 
-export function formatMonthDay(ms: number): string {
+export function formatMonthDay(ms: number, locale: Locale = 'zh'): string {
   const p = beijingParts(ms)
+  if (locale === 'en') return `${MONTHS_EN_SHORT[p.month - 1]} ${p.day}`
   return `${p.month}月${p.day}日`
 }
 
@@ -87,16 +103,30 @@ export function formatTimeHM(ms: number): string {
   return `${pad(p.hour)}:${pad(p.minute)}`
 }
 
-export function formatDateTimeCN(ms: number, includeSeconds = false): string {
-  return `${formatDateCN(ms)} ${includeSeconds ? formatTimeHMS(ms) : formatTimeHM(ms)}`
+export function formatDateTimeCN(
+  ms: number,
+  includeSeconds = false,
+  locale: Locale = 'zh',
+): string {
+  const time = includeSeconds ? formatTimeHMS(ms) : formatTimeHM(ms)
+  if (locale === 'en') {
+    const p = beijingParts(ms)
+    return `${MONTHS_EN_SHORT[p.month - 1]} ${p.day}, ${p.year} · ${time}`
+  }
+  return `${formatDateCN(ms)} ${time}`
 }
 
-export function formatMonthDayTime(ms: number): string {
+export function formatMonthDayTime(ms: number, locale: Locale = 'zh'): string {
+  if (locale === 'en') {
+    const p = beijingParts(ms)
+    return `${MONTHS_EN_SHORT[p.month - 1]} ${p.day}, ${formatTimeHM(ms)}`
+  }
   return `${formatMonthDay(ms)} ${formatTimeHM(ms)}`
 }
 
-export function weekdayCN(ms: number): string {
-  return WEEKDAYS[beijingParts(ms).weekday]
+export function weekdayCN(ms: number, locale: Locale = 'zh'): string {
+  const weekday = beijingParts(ms).weekday
+  return locale === 'en' ? WEEKDAYS_EN[weekday] : WEEKDAYS_ZH[weekday]
 }
 
 /** 为原生 date 输入生成 YYYY-MM-DD */
@@ -140,18 +170,31 @@ export function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value))
 }
 
-export function humanizeDuration(ms: number): string {
+export function humanizeDuration(ms: number, locale: Locale = 'zh'): string {
   const totalMinutes = Math.max(0, Math.floor(Math.abs(ms) / 60_000))
   const days = Math.floor(totalMinutes / 1440)
   const hours = Math.floor((totalMinutes % 1440) / 60)
   const minutes = totalMinutes % 60
+  if (locale === 'en') {
+    const dayLabel = `${days} ${days === 1 ? 'day' : 'days'}`
+    const hourLabel = `${hours} ${hours === 1 ? 'hour' : 'hours'}`
+    const minuteLabel = `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`
+    if (days > 0) return `${dayLabel} ${hourLabel}`
+    if (hours > 0) return `${hourLabel} ${minuteLabel}`
+    return minuteLabel
+  }
   if (days > 0) return `${days} 天 ${hours} 小时`
   if (hours > 0) return `${hours} 小时 ${minutes} 分钟`
   return `${minutes} 分钟`
 }
 
-export function describeOffset(offsetMs: number): string {
+export function describeOffset(offsetMs: number, locale: Locale = 'zh'): string {
   const absolute = Math.abs(offsetMs)
+  if (locale === 'en') {
+    if (absolute < 30_000) return 'essentially synchronised with real time'
+    const span = humanizeDuration(absolute, locale)
+    return offsetMs > 0 ? `ahead of real time by ${span}` : `behind real time by ${span}`
+  }
   if (absolute < 30_000) return '与现实时间基本同步'
   const span = humanizeDuration(absolute)
   return offsetMs > 0 ? `比现实时间早 ${span}` : `比现实时间晚 ${span}`
@@ -160,6 +203,8 @@ export function describeOffset(offsetMs: number): string {
 /** 当前年份加小数部分的近似值，仅用于天文计算的初值/展示。 */
 export function decimalYear(ms: number): number {
   const p = beijingParts(ms)
-  return p.year + (Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) - Date.UTC(p.year, 0, 1)) /
-    (365.2422 * DAY_MS)
+  return p.year +
+    (Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) -
+      Date.UTC(p.year, 0, 1)) /
+      (365.2422 * DAY_MS)
 }

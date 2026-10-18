@@ -256,6 +256,50 @@ main {
   right: 0;
 }
 
+.header-language {
+  flex: 0 0 auto;
+}
+
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  padding: 2px;
+  border: 1px solid var(--panel-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.lang-button {
+  min-width: 26px;
+  height: 24px;
+  padding: 0 5px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-faint);
+  font-family: var(--sans);
+  font-size: 9px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.lang-button:hover {
+  color: var(--ink-soft);
+}
+
+.lang-button.is-active {
+  background: rgba(201, 170, 112, 0.16);
+  color: var(--gold-bright);
+}
+
+.lang-switch__divider {
+  width: 1px;
+  height: 10px;
+  background: var(--panel-line);
+}
+
 .header-now {
   display: flex;
   align-items: center;

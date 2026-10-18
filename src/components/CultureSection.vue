@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { CULTURE_ASPECTS, CULTURE_INTRO } from '../data/culture'
+import { computed } from 'vue'
+import { useI18n } from '../i18n/index.ts'
+import { getCultureIntro, getLocalizedCulture } from '../i18n/content.ts'
+
+const { locale, t } = useI18n()
+const aspects = computed(() => getLocalizedCulture(locale.value))
+const intro = computed(() => getCultureIntro(locale.value))
 
 const GLYPHS: Record<string, string> = {
   agriculture: '农',
@@ -15,17 +21,17 @@ const GLYPHS: Record<string, string> = {
   <section id="culture" class="reading-section culture-section" aria-labelledby="culture-title">
     <header class="section-heading section-heading--split">
       <div>
-        <p class="section-kicker"><span>卷三</span> 风物</p>
-        <h2 id="culture-title">节气落在人间，<br />长成了什么？</h2>
+        <p class="section-kicker"><span>{{ t('culture.kicker') }}</span> {{ t('culture.kickerTitle') }}</p>
+        <h2 id="culture-title">{{ t('culture.titleA') }}<br />{{ t('culture.titleB') }}</h2>
       </div>
       <div class="section-heading__aside">
-        <p>{{ CULTURE_INTRO }}</p>
+        <p>{{ intro }}</p>
       </div>
     </header>
 
     <div class="culture-grid">
       <article
-        v-for="(aspect, index) in CULTURE_ASPECTS"
+        v-for="(aspect, index) in aspects"
         :key="aspect.id"
         class="culture-card"
         :class="`culture-card--${aspect.id}`"
@@ -44,10 +50,8 @@ const GLYPHS: Record<string, string> = {
 
     <aside class="culture-quote">
       <p class="culture-quote__mark" aria-hidden="true">“</p>
-      <blockquote>
-        清明前后种瓜点豆，冬至桌上端一碗热汤圆。节气真正留下来的方式，不只是历法上的名词，而是仍然被使用的生活。
-      </blockquote>
-      <p class="culture-quote__from">一种仍然活着的时间知识</p>
+      <blockquote>{{ t('culture.quote') }}</blockquote>
+      <p class="culture-quote__from">{{ t('culture.quoteFrom') }}</p>
     </aside>
   </section>
 </template>

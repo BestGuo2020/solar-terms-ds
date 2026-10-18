@@ -8,16 +8,26 @@ import {
   SUPPORTED_YEAR_MIN,
 } from '../src/astro/solar-terms.ts'
 import {
+  formatDateCN,
   formatDateTimeCN,
+  humanizeDuration,
   beijingParts,
   fromBeijing,
 } from '../src/astro/beijing-time.ts'
 import { SOLAR_TERMS, SEASON_META } from '../src/data/term-catalog.ts'
 import { SONG_LINES, SONG_TERM_SEQUENCE } from '../src/data/song.ts'
-import { HISTORY_TIMELINE } from '../src/data/history.ts'
-import { CULTURE_ASPECTS } from '../src/data/culture.ts'
-import { SCIENCE_FAQ } from '../src/data/science.ts'
+import { HISTORY_TIMELINE, HISTORY_INTRO_EN } from '../src/data/history.ts'
+import { CULTURE_ASPECTS, CULTURE_INTRO_EN } from '../src/data/culture.ts'
+import { SCIENCE_FAQ, SCIENCE_INTRO_EN } from '../src/data/science.ts'
 import { SOURCES, METHOD_NOTES } from '../src/data/sources.ts'
+import { TERM_DETAILS_EN } from '../src/data/en/term-details.ts'
+import { TERM_NAMES_EN, SEASON_LABELS_EN } from '../src/data/en/term-labels.ts'
+import { HISTORY_TIMELINE_EN } from '../src/data/en/history.ts'
+import { CULTURE_ASPECTS_EN } from '../src/data/en/culture.ts'
+import { SCIENCE_FAQ_EN } from '../src/data/en/science.ts'
+import { SONG_LINES_EN } from '../src/data/en/song.ts'
+import { SOURCE_COPY_EN } from '../src/data/en/sources.ts'
+import { messages } from '../src/i18n/messages.ts'
 import {
   AXIAL_TILT_DEG,
   axisSunAngle,
@@ -251,11 +261,93 @@ assert(METHOD_NOTES.algorithm.includes('15°'), '方法说明包含黄经 15° �
 assert(METHOD_NOTES.precision.includes('1 分钟'), '方法说明写明已校验的精度')
 assert(METHOD_NOTES.timezone.includes('UTC+8'), '方法说明写明北京时间时区')
 
-// 8. 北京时间
+// 8. 英文本地化内容
+assertEqual(TERM_DETAILS_EN.length, 24, '英文节气详情包含 24 条')
+assertEqual(new Set(TERM_DETAILS_EN.map((term) => term.name)).size, 24, '英文节气名称唯一')
+for (const [index, term] of TERM_DETAILS_EN.entries()) {
+  assertEqual(term.index, index, `英文 ${term.name} 序号连续`)
+  assertEqual(term.name, TERM_NAMES_EN[index], `英文 ${term.name} 与名称表一致`)
+  assertEqual(term.nameZh, SOLAR_TERMS[index].name, `英文 ${term.name} 保留中文名称`)
+  assertEqual(term.longitude, SOLAR_TERMS[index].longitude, `英文 ${term.name} 黄经与中文表一致`)
+  assertEqual(term.season, SEASON_LABELS_EN[SOLAR_TERMS[index].season], `英文 ${term.name} 季节字段与中文一致`)
+  assert(term.name.length >= 5, `英文 ${term.name} 名称完整`)
+  assert(term.pinyin.length >= 3, `英文 ${term.name} 有拼音`)
+  assert(term.meaning.length >= 40, `英文 ${term.name} 有释义`)
+  assert(term.climate.length >= 80, `英文 ${term.name} 有气候内容`)
+  assert(term.phenology.length >= 80, `英文 ${term.name} 有物候内容`)
+  assertEqual(term.pentads.length, 3, `英文 ${term.name} 三候齐备`)
+  assert(term.pentads.every((pentad) => pentad.en.length >= 6 && pentad.zh.length >= 2), `英文 ${term.name} 三候双语非空`)
+  assert(term.farming.length >= 60, `英文 ${term.name} 有农事内容`)
+  assert(term.custom.length >= 60, `英文 ${term.name} 有习俗内容`)
+  assert(term.food.length >= 40, `英文 ${term.name} 有饮食内容`)
+  assert(Boolean(term.poem?.en && term.poem?.author && term.poem?.source), `英文 ${term.name} 有诗词与出处`)
+  assert(Boolean(term.proverb?.en && term.proverb?.zh), `英文 ${term.name} 有双语农谚`)
+}
+assertEqual(HISTORY_TIMELINE_EN.length, HISTORY_TIMELINE.length, '英文历史时间线长度与中文一致')
+assertEqual(
+  HISTORY_TIMELINE_EN.map((event) => event.id).join(','),
+  HISTORY_TIMELINE.map((event) => event.id).join(','),
+  '英文历史时间线 id 与中文一一对应',
+)
+for (const event of HISTORY_TIMELINE_EN) {
+  assert(Boolean(event.era && event.year && event.title && event.detail), `英文历史条目 ${event.id} 字段完整`)
+}
+assert(HISTORY_INTRO_EN.length > 120, '英文历史导语完整')
+assertEqual(CULTURE_ASPECTS_EN.length, CULTURE_ASPECTS.length, '英文文化侧面数量与中文一致')
+assertEqual(
+  CULTURE_ASPECTS_EN.map((aspect) => aspect.id).join(','),
+  CULTURE_ASPECTS.map((aspect) => aspect.id).join(','),
+  '英文文化侧面 id 与中文一一对应',
+)
+for (const aspect of CULTURE_ASPECTS_EN) {
+  assert(Boolean(aspect.title && aspect.summary), `英文文化侧面 ${aspect.id} 有标题与说明`)
+  assert(aspect.examples.length >= 2, `英文文化侧面 ${aspect.id} 有具体例子`)
+}
+assert(CULTURE_INTRO_EN.length > 120, '英文文化导语完整')
+assertEqual(SCIENCE_FAQ_EN.length, SCIENCE_FAQ.length, '英文科普问答数量与中文一致')
+assertEqual(
+  SCIENCE_FAQ_EN.map((faq) => faq.id).join(','),
+  SCIENCE_FAQ.map((faq) => faq.id).join(','),
+  '英文科普问答 id 与中文一一对应',
+)
+for (const faq of SCIENCE_FAQ_EN) {
+  assert(Boolean(faq.question && faq.answer), `英文科普问答 ${faq.id} 有问有答`)
+}
+assert(SCIENCE_INTRO_EN.length > 100, '英文科普导语完整')
+assertEqual(SONG_LINES_EN.length, SONG_LINES.length, '英文节气歌说明四句齐备')
+for (const [index, line] of SONG_LINES_EN.entries()) {
+  assertEqual(line.text, SONG_LINES[index].text, `英文节气歌第 ${index + 1} 句保留汉字原文`)
+  assertEqual(line.chars.length, 7, `英文节气歌第 ${index + 1} 句有 7 个字位说明`)
+  assert(line.chars.every((cell) => cell.gloss.length >= 20), `英文节气歌第 ${index + 1} 句逐字解释完整`)
+  assert(line.summary.length >= 80, `英文节气歌第 ${index + 1} 句整句解释完整`)
+}
+assertEqual(Object.keys(SOURCE_COPY_EN).length, SOURCES.length, '英文来源说明覆盖全部来源')
+for (const source of SOURCES) {
+  const copy = SOURCE_COPY_EN[source.id]
+  assert(Boolean(copy?.title && copy.publisher && copy.note), `英文来源 ${source.id} 有标题、出版者与说明`)
+}
+assertEqual(Object.keys(messages.en).length, Object.keys(messages.zh).length, '中英文 UI 文案键数量一致')
+assert(
+  Object.keys(messages.zh).every((key) => key in messages.en),
+  '每个中文 UI 文案键都有英文对应',
+)
+assert(
+  Object.values(messages.en).every((value) => value.trim().length > 0),
+  '英文 UI 文案没有空值',
+)
+assert(messages.en['nav.observatory'] === 'Observatory', '英文导航文案正确')
+assert(messages.en['app.htmlLang'] === 'en', '英文页面声明 lang=en')
+assert(messages.en['time.speed24'] === '1 day/s', '英文速度档位已翻译')
+
+// 9. 北京时间与英文格式
 const sample = fromBeijing(2025, 3, 20, 17, 1, 26)
 const parts = beijingParts(sample)
 assertEqual(`${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}:${parts.second}`, '2025-3-20 17:1:26', '北京时间往返转换正确')
 assert(formatDateTimeCN(sample, true).includes('2025年3月20日 17:01:26'), '交节时刻格式化到秒')
+assertEqual(formatDateCN(sample, 'en'), '20 March 2025', '英文日期使用英文月份全称')
+assert(formatDateTimeCN(sample, true, 'en').includes('Mar 20, 2025 · 17:01:26'), '英文交节时刻格式正确')
+assertEqual(humanizeDuration(90 * 60_000, 'en'), '1 hour 30 minutes', '英文时长格式正确')
+assertEqual(humanizeDuration(90 * 60_000, 'zh'), '1 小时 30 分钟', '中文时长格式保持正确')
 
 // 输出
 console.log(`\n通过 ${passed} 项断言。`)
@@ -263,7 +355,7 @@ console.log(`参考年历：${referenceCount} 个时刻，与公布分钟起点�
 console.log(`太阳视黄经最大反解残差：${maxLongitudeResidual.toExponential(2)}°。`)
 console.log(`2024 年节气间隔：${shortest.toFixed(3)} — ${longest.toFixed(3)} 天。`)
 console.log(
-  `当前内容：${SOLAR_TERMS.length} 个节气 · ${HISTORY_TIMELINE.length} 条历史 · ${CULTURE_ASPECTS.length} 个文化侧面 · ${SCIENCE_FAQ.length} 个问答 · ${SOURCES.length} 条来源。`,
+  `当前内容：${SOLAR_TERMS.length} 个节气 × 2 种语言 · ${HISTORY_TIMELINE.length} 条历史 · ${CULTURE_ASPECTS.length} 个文化侧面 · ${SCIENCE_FAQ.length} 个问答 · ${SOURCES.length} 条来源。`,
 )
 console.log(`支持年份：${SUPPORTED_YEAR_MIN}—${SUPPORTED_YEAR_MAX}，时区 ${METHOD_NOTES.timezone}。\n`)
 

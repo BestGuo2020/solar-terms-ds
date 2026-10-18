@@ -17,7 +17,6 @@ import {
   endOfBeijingYear,
   formatDateCN,
   formatDateWithWeekday,
-  formatDateTimeCN,
   formatTimeHMS,
   fromBeijing,
   humanizeDuration,
@@ -28,19 +27,23 @@ import {
 } from '../astro/beijing-time.ts'
 import { SEASON_META, OPPOSITE_SEASON } from '../data/term-catalog.ts'
 import type { TermOccurrence } from '../data/types.ts'
+import { useI18n } from '../i18n/index.ts'
+import type { MessageKey } from '../i18n/messages.ts'
 
 export interface SpeedOption {
   /** 每现实一秒推进多少天 */
   daysPerSecond: number
-  label: string
-  detail: string
+  labelKey: MessageKey
+  detailKey: MessageKey
 }
 
 export const SPEED_OPTIONS: readonly SpeedOption[] = [
-  { daysPerSecond: 1 / 24, label: '1 小时/秒', detail: '适合细看地球自转与晨昏线' },
-  { daysPerSecond: 0.25, label: '6 小时/秒', detail: '约四秒过一天，推荐' },
-  { daysPerSecond: 1, label: '1 天/秒', detail: '快速浏览全年四季变化' },
+  { daysPerSecond: 1 / 24, labelKey: 'time.speed1', detailKey: 'time.speed1Detail' },
+  { daysPerSecond: 0.25, labelKey: 'time.speed6', detailKey: 'time.speed6Detail' },
+  { daysPerSecond: 1, labelKey: 'time.speed24', detailKey: 'time.speed24Detail' },
 ]
+
+const { locale, t } = useI18n()
 
 export type SimulationMode = 'live' | 'simulated'
 
@@ -73,12 +76,14 @@ const orbitAngle = computed(() => (solarLongitude.value + 180) % 360)
 const seasonMeta = computed(() => SEASON_META[activeTerm.value.season])
 const oppositeSeason = computed(() => OPPOSITE_SEASON[activeTerm.value.season])
 const isSimulated = computed(() => mode.value === 'simulated')
-const dateText = computed(() => formatDateCN(simMs.value))
-const weekdayText = computed(() => weekdayCN(simMs.value))
-const fullDateText = computed(() => formatDateWithWeekday(simMs.value))
+const dateText = computed(() => formatDateCN(simMs.value, locale.value))
+const weekdayText = computed(() => weekdayCN(simMs.value, locale.value))
+const fullDateText = computed(() => formatDateWithWeekday(simMs.value, locale.value))
 const timeText = computed(() => formatTimeHMS(simMs.value))
 const simulatedOffsetText = computed(() =>
-  isSimulated.value ? describeOffset(simMs.value - Date.now()) : '跟随现实时间',
+  isSimulated.value
+    ? describeOffset(simMs.value - Date.now(), locale.value)
+    : t('common.followingReality'),
 )
 const datetimeInputValue = computed(() => toDatetimeLocalValue(simMs.value))
 const timelineFraction = computed(() => {
@@ -87,9 +92,11 @@ const timelineFraction = computed(() => {
   return clamp((simMs.value - start) / (end - start), 0, 1)
 })
 const termProgressPercent = computed(() => activeWindow.value.progress * 100)
-const elapsedText = computed(() => humanizeDuration(activeWindow.value.elapsedMs))
-const remainingText = computed(() => humanizeDuration(activeWindow.value.remainingMs))
-const yearStartText = computed(() => formatDateCN(startOfBeijingYear(selectedYear.value)))
+const elapsedText = computed(() => humanizeDuration(activeWindow.value.elapsedMs, locale.value))
+const remainingText = computed(() => humanizeDuration(activeWindow.value.remainingMs, locale.value))
+const yearStartText = computed(() =>
+  formatDateCN(startOfBeijingYear(selectedYear.value), locale.value),
+)
 
 function notifyBoundary(message: string): void {
   boundaryNotice.value = message
@@ -125,13 +132,13 @@ function tick(deltaSeconds: number): void {
   if (next >= MAX_SIM_MS) {
     simMs.value = MAX_SIM_MS
     isPlaying.value = false
-    notifyBoundary('已经到达本站支持范围的终点：2100 年。可拖动时间轴回看其他年份。')
+    notifyBoundary(t('time.boundaryEnd'))
     return
   }
   if (next <= MIN_SIM_MS) {
     simMs.value = MIN_SIM_MS
     isPlaying.value = false
-    notifyBoundary('已经到达本站支持范围的起点：1900 年。')
+    notifyBoundary(t('time.boundaryStart'))
     return
   }
   simMs.value = next
@@ -224,11 +231,14 @@ function selectTermInYearOfSimulation(termIndex: number): TermOccurrence {
 
 function setFromDatetimeInput(value: string): { ok: boolean; error?: string; ms?: number } {
   const parsed = parseBeijingDatetimeLocal(value)
-  if (parsed === null) return { ok: false, error: '请输入有效的日期与时间。' }
+  if (parsed === null) return { ok: false, error: t('time.invalid') }
   if (parsed < MIN_SIM_MS || parsed > MAX_SIM_MS) {
     return {
       ok: false,
-      error: `演示年份只支持 ${SUPPORTED_YEAR_MIN}—${SUPPORTED_YEAR_MAX} 年。`,
+      error: t('time.outOfRange', {
+        min: SUPPORTED_YEAR_MIN,
+        max: SUPPORTED_YEAR_MAX,
+      }),
     }
   }
   setSimulatedTime(parsed)
@@ -313,7 +323,6 @@ export function useObservatory() {
     setFromDatetimeInput,
     seekTimeline,
     getOccurrenceInSelectedYear,
-    formatDateTimeCN,
     clearBoundaryNotice,
   }
 }

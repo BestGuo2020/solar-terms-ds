@@ -4,25 +4,50 @@ import { useObservatory } from '../stores/observatory'
 import { SOLAR_TERMS, SEASON_META, SEASON_ORDER } from '../data/term-catalog'
 import { formatMonthDayTime } from '../astro/beijing-time'
 import type { Season } from '../data/types'
+import { useI18n } from '../i18n/index.ts'
+import {
+  getSeasonName,
+  getTermName,
+  getTermNativeName,
+} from '../i18n/content.ts'
 
 const emit = defineEmits<{ (event: 'select-term', termIndex: number): void }>()
 const store = useObservatory()
+const { locale, t } = useI18n()
 const { selectedYear, yearTermMap, activeTerm } = store
 
 const seasonGroups = computed(() =>
-  SEASON_ORDER.map((season: Season) => ({
-    season,
-    meta: SEASON_META[season],
-    terms: SOLAR_TERMS.filter((term) => term.season === season).map((term) => {
+  SEASON_ORDER.map((season: Season) => {
+    const terms = SOLAR_TERMS.filter((term) => term.season === season).map((term) => {
       const occurrence = yearTermMap.value.get(term.index)
+      const name = getTermName(term.index, locale.value)
+      const timeLabel = occurrence ? formatMonthDayTime(occurrence.ms, locale.value) : '—'
+      const fullLabel = occurrence
+        ? t('terms.cardAria', {
+            name,
+            year: selectedYear.value,
+            time: formatMonthDayTime(occurrence.ms, locale.value),
+            longitude: term.longitude,
+          })
+        : t('terms.aria', { name, longitude: term.longitude })
       return {
         term,
+        name,
+        nativeName: getTermNativeName(term.index, locale.value),
         occurrence,
-        timeLabel: occurrence ? formatMonthDayTime(occurrence.ms) : '—',
-        fullLabel: occurrence ? `${term.name} · ${selectedYear.value} 年 ${formatMonthDayTime(occurrence.ms)}` : term.name,
+        timeLabel,
+        fullLabel,
       }
-    }),
-  })),
+    })
+    return {
+      season,
+      meta: SEASON_META[season],
+      seasonName: getSeasonName(season, locale.value),
+      first: terms[0]?.name ?? '',
+      last: terms[terms.length - 1]?.name ?? '',
+      terms,
+    }
+  }),
 )
 
 function chooseTerm(termIndex: number): void {
@@ -35,15 +60,12 @@ function chooseTerm(termIndex: number): void {
   <section id="terms" class="reading-section term-index-section" aria-labelledby="terms-title">
     <header class="section-heading section-heading--split">
       <div>
-        <p class="section-kicker"><span>卷一</span> 岁时谱</p>
-        <h2 id="terms-title">一年的二十四个刻度</h2>
+        <p class="section-kicker"><span>{{ t('terms.kicker') }}</span> {{ t('terms.kickerTitle') }}</p>
+        <h2 id="terms-title">{{ t('terms.title') }}</h2>
       </div>
       <div class="section-heading__aside">
-        <p>
-          下方时刻均为 <strong>{{ selectedYear }}</strong> 年的真实交节时刻。点击任意一格，
-          地球会停到那一刻，观测台与节气详情同步切换。
-        </p>
-        <p class="section-heading__note">当前区间若从上一公历年延续，以详情中的实际交节时刻为准。</p>
+        <p>{{ t('terms.aside', { year: selectedYear }) }}</p>
+        <p class="section-heading__note">{{ t('terms.note') }}</p>
       </div>
     </header>
 
@@ -58,8 +80,8 @@ function chooseTerm(termIndex: number): void {
         <div class="term-group__label">
           <span class="term-group__glyph" aria-hidden="true">{{ group.season }}</span>
           <div>
-            <h3 :id="`season-${group.season}`">{{ group.meta.label }}</h3>
-            <p>{{ group.terms[0]?.term.name }} — {{ group.terms[group.terms.length - 1]?.term.name }}</p>
+            <h3 :id="`season-${group.season}`">{{ group.seasonName }}</h3>
+            <p>{{ t('terms.groupRange', { first: group.first, last: group.last }) }}</p>
           </div>
         </div>
         <div class="term-group__grid">
@@ -72,21 +94,24 @@ function chooseTerm(termIndex: number): void {
               'is-active': activeTerm.index === item.term.index,
               'is-major': item.term.major,
             }"
-            :aria-label="`${item.fullLabel}，太阳黄经 ${item.term.longitude} 度。点击跳转到该节气`"
+            :aria-label="item.fullLabel"
             :aria-current="activeTerm.index === item.term.index ? 'true' : undefined"
             :data-term-index="item.term.index"
             :data-term-name="item.term.name"
+            :data-term-name-localized="item.name"
             @click="chooseTerm(item.term.index)"
           >
             <span class="term-card__top">
               <span class="term-card__order">{{ String(item.term.index + 1).padStart(2, '0') }}</span>
-              <span v-if="activeTerm.index === item.term.index" class="term-card__now">当前</span>
+              <span v-if="activeTerm.index === item.term.index" class="term-card__now">{{ t('terms.current') }}</span>
               <span v-else class="term-card__lambda">λ {{ item.term.longitude }}°</span>
             </span>
-            <span class="term-card__name">{{ item.term.name }}</span>
-            <span class="term-card__pinyin">{{ item.term.pinyin }}</span>
+            <span class="term-card__name">{{ item.name }}</span>
+            <span class="term-card__pinyin">
+              {{ locale === 'en' ? `${item.nativeName} · ${item.term.pinyin}` : item.term.pinyin }}
+            </span>
             <span class="term-card__date">{{ item.timeLabel }}</span>
-            <span v-if="item.term.major" class="term-card__major">分至</span>
+            <span v-if="item.term.major" class="term-card__major">{{ t('terms.major') }}</span>
           </button>
         </div>
       </section>

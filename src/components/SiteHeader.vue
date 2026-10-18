@@ -1,18 +1,25 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useObservatory } from '../stores/observatory'
+import { useI18n } from '../i18n/index.ts'
+import { getTermName } from '../i18n/content.ts'
+import type { MessageKey } from '../i18n/messages.ts'
+import LanguageSwitch from './LanguageSwitch.vue'
 
 const { activeTerm, isSimulated } = useObservatory()
+const { locale, t } = useI18n()
 const menuOpen = ref(false)
 
-const navItems = [
-  { href: '#observatory', label: '观测台' },
-  { href: '#terms', label: '岁时谱' },
-  { href: '#history', label: '源流' },
-  { href: '#culture', label: '风物' },
-  { href: '#song', label: '节气歌' },
-  { href: '#science', label: '问四时' },
-  { href: '#sources', label: '参考' },
+const activeTermName = computed(() => getTermName(activeTerm.value.index, locale.value))
+
+const navItems: Array<{ href: string; labelKey: MessageKey }> = [
+  { href: '#observatory', labelKey: 'nav.observatory' },
+  { href: '#terms', labelKey: 'nav.terms' },
+  { href: '#history', labelKey: 'nav.history' },
+  { href: '#culture', labelKey: 'nav.culture' },
+  { href: '#song', labelKey: 'nav.song' },
+  { href: '#science', labelKey: 'nav.science' },
+  { href: '#sources', labelKey: 'nav.sources' },
 ]
 
 function closeMenu(): void {
@@ -33,7 +40,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 
 <template>
   <header class="site-header">
-    <a class="brand" href="#top" aria-label="观象 · 二十四节气，回到页面顶部" @click="closeMenu">
+    <a class="brand" href="#top" :aria-label="t('brand.homeAria')" @click="closeMenu">
       <span class="brand-mark" aria-hidden="true">
         <svg viewBox="0 0 48 48" fill="none">
           <circle cx="25" cy="22" r="6" fill="currentColor" />
@@ -43,20 +50,22 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
         </svg>
       </span>
       <span class="brand-words">
-        <strong>观象</strong>
-        <small>二十四节气</small>
+        <strong>{{ t('brand.name') }}</strong>
+        <small>{{ t('brand.subtitle') }}</small>
       </span>
     </a>
 
-    <nav class="desktop-nav" aria-label="页面导航">
-      <a v-for="item in navItems" :key="item.href" :href="item.href">{{ item.label }}</a>
+    <nav class="desktop-nav" :aria-label="t('nav.aria')">
+      <a v-for="item in navItems" :key="item.href" :href="item.href">{{ t(item.labelKey) }}</a>
     </nav>
+
+    <LanguageSwitch class="header-language" />
 
     <div class="header-now">
       <span class="header-now__dot" :class="{ 'is-sim': isSimulated }" aria-hidden="true"></span>
       <span class="header-now__copy">
-        <small>{{ isSimulated ? '模拟时间' : '此刻' }}</small>
-        <strong>{{ activeTerm.name }}</strong>
+        <small>{{ isSimulated ? t('header.simulated') : t('header.now') }}</small>
+        <strong>{{ activeTermName }}</strong>
       </span>
     </div>
 
@@ -65,7 +74,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
       class="menu-toggle"
       :aria-expanded="menuOpen"
       aria-controls="mobile-navigation"
-      :aria-label="menuOpen ? '关闭导航菜单' : '打开导航菜单'"
+      :aria-label="menuOpen ? t('menu.close') : t('menu.open')"
       @click="menuOpen = !menuOpen"
     >
       <span></span>
@@ -76,12 +85,12 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
       v-if="menuOpen"
       id="mobile-navigation"
       class="mobile-nav"
-      aria-label="移动端页面导航"
+      :aria-label="t('nav.mobileAria')"
     >
       <a v-for="(item, index) in navItems" :key="item.href" :href="item.href" @click="closeMenu">
-        <span>0{{ index + 1 }}</span>{{ item.label }}
+        <span>0{{ index + 1 }}</span>{{ t(item.labelKey) }}
       </a>
-      <p class="mobile-nav__note">拖动地球、选一个节气，或者继续向下阅读。</p>
+      <p class="mobile-nav__note">{{ t('nav.note') }}</p>
     </nav>
   </header>
 </template>
