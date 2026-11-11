@@ -40,6 +40,12 @@ const seasonPositions: Array<{ season: Season; cx: number; cy: number; labelKey:
   { season: '冬', cx: 190, cy: 182, labelKey: 'science.diagramWinter' },
 ]
 
+// 地轴与轨道法线的夹角 23.44°，地轴穿过球心，四个位置方向一致（全年不变）。
+const AXIAL_TILT_RAD = (23.44 * Math.PI) / 180
+const AXIS_HALF_LENGTH = 15
+const axisOffsetX = Math.sin(AXIAL_TILT_RAD) * AXIS_HALF_LENGTH
+const axisOffsetY = Math.cos(AXIAL_TILT_RAD) * AXIS_HALF_LENGTH
+
 function toggleFaq(id: string): void {
   openId.value = openId.value === id ? '' : id
 }
@@ -79,15 +85,19 @@ function toggleFaq(id: string): void {
             <g v-for="point in seasonPositions" :key="point.season" :class="{ 'is-current': point.season === currentSeason }">
               <circle :cx="point.cx" :cy="point.cy" r="10" fill="#f2eddf" stroke="currentColor" stroke-opacity=".35" />
               <line
-                :x1="point.cx - 12"
-                :y1="point.cy + 13"
-                :x2="point.cx - 5"
-                :y2="point.cy - 12"
-                stroke="currentColor"
-                stroke-opacity=".55"
-                stroke-width="1.3"
+                class="diagram-normal"
+                :x1="point.cx"
+                :y1="point.cy - AXIS_HALF_LENGTH"
+                :x2="point.cx"
+                :y2="point.cy + AXIS_HALF_LENGTH"
               />
-              <line :x1="point.cx - 12" :y1="point.cy + 13" :x2="point.cx - 12" :y2="point.cy + 7" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="2 2" />
+              <line
+                class="diagram-axis"
+                :x1="point.cx - axisOffsetX"
+                :y1="point.cy + axisOffsetY"
+                :x2="point.cx + axisOffsetX"
+                :y2="point.cy - axisOffsetY"
+              />
               <text :x="point.cx" :y="point.cy + 29" text-anchor="middle" class="diagram-label">{{ t(point.labelKey) }}</text>
             </g>
             <text x="324" y="28" text-anchor="end" class="diagram-note">{{ t('science.diagramAxisNote') }}</text>

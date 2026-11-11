@@ -986,6 +986,22 @@
   overflow: visible;
 }
 
+/* 地轴：穿过球心，与轨道法线成 23.44°，四个位置方向一致 */
+.diagram-axis {
+  stroke: currentColor;
+  stroke-opacity: 0.55;
+  stroke-width: 1.3;
+  stroke-linecap: round;
+}
+
+/* 轨道法线：细虚线，用来对照地轴的倾斜 */
+.diagram-normal {
+  stroke: currentColor;
+  stroke-opacity: 0.3;
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+
 .diagram-label {
   fill: currentColor;
   font-family: var(--serif);
