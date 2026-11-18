@@ -1,0 +1,48 @@
+{
+  "buildCommand": "node scripts/build-pages.mjs",
+  "installCommand": "node scripts/install-deps.mjs",
+  "outputDirectory": "dist",
+  "nodeVersion": "22.11.0",
+  "redirects": [
+    {
+      "source": "/deepseek-v4.1-flash-0910",
+      "destination": "/deepseek-v4.1-flash-0910/",
+      "statusCode": 301
+    },
+    {
+      "source": "/deepseek-v4.1-flash-1017",
+      "destination": "/deepseek-v4.1-flash-1017/",
+      "statusCode": 301
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/deepseek-v4.1-flash-0910/",
+      "destination": "/deepseek-v4.1-flash-0910/index.html"
+    },
+    {
+      "source": "/deepseek-v4.1-flash-1017/",
+      "destination": "/deepseek-v4.1-flash-1017/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/deepseek-v4.1-flash-0910/assets/*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/deepseek-v4.1-flash-1017/assets/*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ]
+}

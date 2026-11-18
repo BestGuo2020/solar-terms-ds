@@ -1,0 +1,7 @@
+# pnpm 配置（pnpm 10 起，原先写在 package.json 的 pnpm 字段已迁移到这里）
+#
+# esbuild 的 postinstall 会在受限环境（禁止子进程管道）里失败，
+# 但其平台二进制包 @esbuild/win32-x64 已随依赖一起安装、可直接使用，
+# 因此这里显式关掉该构建脚本，安装过程更稳、更快。
+allowBuilds:
+  esbuild: false

@@ -1,165 +1,167 @@
-# 观象 · 二十四节气 / Guanxiang · The 24 Solar Terms
+# 二十四节气 · 多版本站点
 
-一个以 **Three.js** 日地公转场景为核心的二十四节气**中英双语**互动科普网站。页面用真实的地心视黄经反解交节时刻，把节气、太阳黄经、地球位置与四季关系放在同一套模拟时间里，同时以两种语言收录二十四节气的历史源流、文化价值、节气歌、科普问答与参考来源。
+同一个域名下同时发布两个版本的「日地公转 · 二十四节气」互动站点，推一次 `main` 就能一起上线：
 
-![桌面端观测台](./docs/preview-desktop.png)
-
-| 英文界面 | 地球近景 |
+| 线上路径 | 内容 |
 | --- | --- |
-| ![英文桌面端](./docs/preview-en.png) | ![地球近景](./docs/preview-earth.png) |
+| `/` | 新版首页（复用 1017 版构建产物） |
+| `/deepseek-v4.1-flash-1017/` | 1017 版（新版）整站 |
+| `/deepseek-v4.1-flash-0910/` | 0910 版整站 |
 
-| 移动端（中文） | 移动端（English） |
-| --- | --- |
-| <img src="./docs/preview-mobile.png" width="330" alt="中文移动端观测台" /> | <img src="./docs/preview-mobile-en.png" width="330" alt="English mobile observatory" /> |
+## 目录结构
 
-## 快速开始
-
-环境：Node.js 20+（本项目在 Node 24 上验证），推荐使用 pnpm。
-
-```bash
-pnpm install
-pnpm dev        # http://127.0.0.1:5183
-pnpm build      # 类型检查 + 生产构建，输出到 dist/
-pnpm preview    # 预览生产构建，http://127.0.0.1:4180
 ```
-
-检查与验收：
-
-```bash
-pnpm verify:astro     # 天文、坐标、节气歌、双语内容完整性的 1449 项断言
-pnpm dev              # 另开一个终端
-pnpm verify:browser   # 桌面、平板与移动端、双语与纹理失败替代的 131 项断言
-```
-
-浏览器验收脚本使用本机 Microsoft Edge 的无头模式。若 Edge 不在默认路径：
-
-```powershell
-$env:EDGE_PATH = "C:\path\to\msedge.exe"
-$env:PREVIEW_URL = "http://127.0.0.1:5183/"
-pnpm verify:browser
-```
-
-脚本会把验收截图写入 `shots/`（不参与构建与提交）。
-
-## 页面内容与交互
-
-### 一处时间，驱动全部状态
-
-默认打开页面时使用真实当前时间，并以下方 **Asia/Shanghai / UTC+8 标准时** 显示。播放、暂停、调速、拖动年度时间轴、日期选择、年份切换、点击轨道节气标记或节气歌字位，全部写入同一个 `simMs` 时间源。地球位置、太阳黄经、当前节气区间、轨道高亮、详情与交节时刻都由这一时刻派生。
-
-- **实时 / 模拟时间**在页头、场景和控制器中都有明确标识。
-- “当前已进入的节气区间”和“某个节气开始的准确交节时刻”分开显示。
-- 播放速度：1 小时/秒、6 小时/秒、1 天/秒；播放时地球公转与自转同步推进。
-- 年度时间轴上的刻度是当年真实交节时刻，间距并不相等。
-- “回到今天”恢复实时时间与暂停状态。
-- 支持的演示年份：**1900—2100**。年份选择、年份说明和日期范围严格限制在这一区间。
-
-### 中英双语 / Bilingual
-
-- 页头提供紧凑的 **中 / EN** 切换；也可以直接用 `?lang=en` 打开英文界面。选择保存在 `localStorage`，刷新后保持，并同步写回 URL 参数，便于分享。
-- 导航、首屏、三维场景、时间控制器、岁时谱、历史、文化、节气歌、科普、来源、页脚、提示消息与无障碍名称均使用对应语言。
-- 24 个节气的英文名称、拼音、中文原名、释义、气候、三候、农事、习俗、饮食、诗词与农谚全部有独立英文内容；历史时间线、文化侧面、节气歌解释、科普问答与参考来源同样完整英译。
-- 日期与时间按语言格式化：中文为「2026年10月18日 星期日」，英文为「18 October 2026 · Sunday」；交节时刻、时长、时区与年份选择也随语言变化。
-- 中文轨道显示全部 24 个节气名；英文名称较长，为避免轨道标签互相遮挡，英文模式显示**当前节气与四个分至**的名称，但仍保留全部 24 个可点击光点，完整英文名称在下方岁时谱中列出，并保留 24 个英文无障碍标签。
-- 节气歌始终保留汉字原文与「重复字按字位映射」的机制；英文版提供逐字、逐句解释，不把助记口诀改写成英文诗。
-
-### 三维观测台
-
-- 真实感地球纹理：昼面、夜面城市灯光、云层、法线贴图、海面高光与大气边缘。
-- 地球公转与自转是两个独立变换；地球自转相位由太阳视赤经与格林尼治恒星时计算，尽可能让昼夜半球与真实地理对应。
-- 地轴固定在惯性空间的方向上，与黄道面法线夹角约 23.44°，一年内不追随太阳。春分、夏至、秋分、冬至的受光关系因此自然正确。
-- 辅助标识均可独立开关：地轴与轨道法线、赤道、南北回归线、公转方向、节气名称。
-- 24 个节气标记按太阳黄经固定在轨道上增加 180° 的地球位置；轨道上的移动光点和左侧详情都来自同一模拟时刻。
-- 视角：轨道总览、地球近景、恢复默认视角；支持鼠标拖动旋转、滚轮缩放、触屏单指旋转与双指缩放。
-- 键盘：画布聚焦后方向键旋转，`+`/`-` 缩放，`Home` 或 `0` 恢复默认视角。
-
-### 内容
-
-- 24 个节气的中英文名称、传统顺序、太阳黄经、季节、交节日期时间、释义、代表性气候、物候三候、农事、习俗、饮食、诗词、农谚。
-- 13 个节点的历史时间线，覆盖日影观测、二至二分、八节、二十四名、进入历法、授时历、时宪历、国家级非遗与 UNESCO 名录等；中英文各一套完整叙述。
-- 文化价值分为农事、日常、饮食、诗文、地方仪式、非遗传承六个侧面，并给出具体地名与做法。
-- 常见四句节气歌完整互动：重复的「春」「夏」「秋」「冬」「雪」均按字位映射；点击字位会暂停并跳到该节气的交节时刻。英文界面保留原文并逐字解释。
-- 四季成因、节气间隔为何不均匀、公历日期为何较稳定、南北半球季节为何相反等六个科普问答，中英文均完整。
-- 页面提供中英文方法说明与参考来源；纹理许可另见双语 `public/textures/CREDITS.md`。
-
-## 天文与精确性
-
-节气取太阳地心视黄经：春分 0°、夏至 90°、秋分 180°、冬至 270°，每 15° 一个节气。项目调用 [Astronomy Engine](https://github.com/cosinekitty/astronomy) 的 `SearchSunLongitude()`，在目标年份内反解太阳视黄经达到目标值的瞬间；**没有使用固定的日期表，也没有把一年平均裁成 24 段**。求根窗口的初始猜测只使用当年春分时刻与太阳平均角速度，最终时刻由视黄经求根器给出。
-
-- 时间基准：北京时间（Asia/Shanghai，固定 UTC+8 标准时），与《中国天文年历》的发布口径一致。页面不叠加 1986—1991 年的历史夏令时。
-- 校验：2024、2025 年共 48 个交节时刻与日本国立天文台《暦要項》公布值逐项比较，**全部落在公布分钟前后 1 分钟内，与分钟起点最大相差 43.2 秒**。官方公布值本身只到分钟，因此不把它当作秒级外部真值。
-- 求根残差：所有校验年份在交节时刻的太阳视黄经反解残差 **< 1.16 × 10⁻⁸ 度**。
-- 2024 年实际节气间隔：**14.721—15.729 天**，验证了“定气法”下并不等分的特征。
-- 交叉年份：1 月 1 日仍会正确落在上一年的冬至区间，并在当年小寒交节时切换。
-- 未来年份的 ΔT 为预测值。Astronomy Engine 使用 Espenak & Meeus 的 ΔT 多项式；越接近 2100 年，交节时刻的误差可能越大。因此 2026 年以后的时刻更适合作为科普与趋势参考，而非绝对精确的历书预报。
-
-## 三维模型简化说明
-
-- 黄道面为场景 XZ 平面，+Y 指向黄道北极；0° 黄经沿 +X，黄经增大方向为从 +Y 俯视逆时针（+X → −Z）。
-- 太阳黄经 λ☉ 是地球看太阳的方向；地球位置角为 **φ⊕ = λ☉ + 180°**，并以此为节气标记和地球位置唯一的方位公式。
-- 为便于观察，轨道使用半径 30 的圆形，地球半径 1.8、太阳半径 4.05。**天体大小和日地距离不按实际比例**；页面在场景与坐标说明中都明确标注。
-- 地轴固定倾斜约 23.44°。1900—2100 年的黄赤交角变化小于 0.1°，为清晰表达四季关系，场景不逐年改变倾角。
-- 未加入月球、其他行星、岁差、章动可视化与真实星表；星空为装饰性背景纹理与点星，不用于天文测量。
-- 地球、太阳、银河纹理来自 Solar System Scope（CC BY 4.0）；地球法线与高光来自 three.js / NASA（MIT）。纹理缺失或被阻断时，页面会自动使用程序化纹理，并显示“部分纹理已使用替代材质”，详情与时间控制仍可用。
-- 移动端自动使用较低像素比、较少球体分段与星点；页面不可见时停止渲染与模拟推进；组件卸载时释放几何体、材质、纹理、事件监听与 WebGL 上下文。
-
-## 项目结构
-
-```text
 .
-├─ src/
-│  ├─ astro/
-│  │  ├─ beijing-time.ts        # 北京时间、双语日期格式与解析
-│  │  ├─ solar-terms.ts         # 视黄经反解交节时刻、当前区间、太阳状态
-│  │  └─ scene-geometry.ts      # 黄经 → 3D 坐标、地轴与受光关系
-│  ├─ data/
-│  │  ├─ term-catalog.ts        # 24 节气基础数据
-│  │  ├─ term-data.ts           # 24 节气中文详情内容
-│  │  ├─ history-data.ts / history.ts
-│  │  ├─ culture-data.ts / culture.ts
-│  │  ├─ science-data.ts / science.ts
-│  │  ├─ song.ts                # 四句节气歌与位置映射
-│  │  ├─ sources.ts             # 来源、方法与精度说明
-│  │  └─ en/                    # 英文节气详情、章节内容、节气歌解释与来源文案
-│  ├─ i18n/
-│  │  ├─ index.ts               # 语言状态、持久化、URL 同步与文档语言
-│  │  ├─ messages.ts            # 中英文 UI 文案（英文键集受类型约束）
-│  │  ├─ content.ts             # 本地化内容访问器
-│  │  └─ types.ts
-│  ├─ three/
-│  │  ├─ SolarSystemScene.ts    # 场景、轨道、双语标签、相机与交互
-│  │  ├─ earth-shaders.ts       # 地球昼夜/云层/大气着色器
-│  │  └─ texture-library.ts     # 纹理加载、程序化替代、释放
-│  ├─ stores/observatory.ts     # 唯一模拟时间与派生状态
-│  ├─ components/               # 场景、详情、时间控制、语言开关与阅读章节
-│  ├─ styles/                   # 基础、观测台、长卷、来源、响应式、双语排版
-│  ├─ AppRoot.vue
-│  └─ entry.ts
+├─ deepseek-v4.1-flash-0910/   0910 版（独立的 Vite + Vue 项目，自带 package.json / 锁文件）
+├─ deepseek-v4.1-flash-1017/   1017 版（独立项目，新版）
 ├─ scripts/
-│  ├─ verify-astro.mjs          # 天文与内容自检
-│  ├─ verify-browser.mjs        # CDP 浏览器与移动端验收
-│  └─ reference-nao.json        # 2024/2025 外部校验数据
-├─ public/textures/             # 本地纹理与 CREDITS.md
-├─ docs/                        # README 预览图
-├─ index.html
-└─ vite.config.ts
+│  ├─ build-pages.mjs          合并构建：两个子项目 → 一个 dist/
+│  └─ serve-dist.mjs           本地预览 dist/（模拟子路径访问）
+├─ edgeone.json                EdgeOne Pages 的构建与路由设置
+└─ package.json                根目录脚本入口
 ```
 
-## 资料与署名
+两个子项目互不引用、各自安装依赖，可以独立升级依赖或单独构建。
 
-历史、非遗与文化部分参考 UNESCO、二十四节气国家级非遗项目资料、中国非物质文化遗产网与公开古籍原文；天文算法与年历校验参考 Jean Meeus《Astronomical Algorithms》、Astronomy Engine、NASA ΔT 资料与日本国立天文台《暦要項》。完整的来源说明与链接见网站“方法与来源”章节。
+## 本地开发
 
-代码以 **MIT License** 发布。纹理许可为：
+```bash
+pnpm install --dir deepseek-v4.1-flash-1017   # 首次
+pnpm dev --dir deepseek-v4.1-flash-1017       # 或根目录 npm run dev:1017
 
-- 地球昼/夜面、云层、太阳表面、银河星图：Solar System Scope，CC BY 4.0。
-- 地球法线、海陆高光：three.js examples（MIT），底图源自 NASA 公开影像。
+pnpm install --dir deepseek-v4.1-flash-0910
+pnpm dev --dir deepseek-v4.1-flash-0910       # 或根目录 npm run dev:0910
+```
 
-如二次分发，请保留 `public/textures/CREDITS.md` 与页脚署名。
+单独构建某一版（产物仍进自己的 `dist/`）：
 
-## 自检结果（2026-10-18）
+```bash
+pnpm build --dir deepseek-v4.1-flash-1017
+```
 
-- `pnpm verify:astro`：**1449 项断言通过**（含双语内容完整性、英文日期格式与中英文键集一致性）。
-- `pnpm verify:browser`：**131 项断言通过**（桌面、地球近景、时间轴拖动、交节边界、节气歌重复字映射、年份范围、语言切换、英文内容、英语移动端、英语平板、菜单、无障碍名称、纹理失败替代）。
-- `pnpm build`：类型检查通过，生产构建成功；并用 `vite preview` 的生产构建重复通过同一套浏览器验收。
+## 合并构建（部署用的就是这一条）
 
-> 以上数字来自本仓库当前版本的实际运行结果；浏览器验收需先启动站点（`pnpm dev` 或 `pnpm preview`）。
+```bash
+npm run build        # 等价于 node scripts/build-pages.mjs
+```
+
+生成的发布目录：
+
+```
+dist/
+├─ index.html                     根目录首页（1017 版构建产物的拷贝）
+├─ deepseek-v4.1-flash-0910/
+│  ├─ index.html
+│  ├─ assets/…
+│  └─ textures/…
+└─ deepseek-v4.1-flash-1017/
+   ├─ index.html
+   ├─ assets/…
+   └─ textures/…
+```
+
+构建脚本会为每个子项目注入两个环境变量，`vite.config.ts` 读取后生效：
+
+- `VITE_BASE=/<站点目录>/`：站点挂载路径，保证 `/deepseek-v4.1-flash-1017`（不带结尾斜杠）也不会把资源解析到上一级
+- `VITE_OUT_DIR=../dist/<站点目录>`：把产物直接输出到统一的 `dist/`，不用再搬文件
+
+根目录首页由脚本把 `dist/deepseek-v4.1-flash-1017/index.html` 复制到 `dist/index.html`，
+只有一份新版构建产物，资源不会重复下载。页面内所有引用都是绝对路径
+（`/deepseek-v4.1-flash-1017/assets/…`），所以放在根目录访问也正常。
+
+只想重建其中一版时，产物不会覆盖另一版：
+
+```bash
+npm run build:1017
+npm run build:0910
+```
+
+## 本地预览
+
+```bash
+npm run preview      # http://127.0.0.1:4318
+```
+
+预览服务器按 EdgeOne 的静态托管行为处理：目录自动补 `index.html`，
+`/deepseek-v4.1-flash-0910` 这种不带斜杠的地址也能打开。
+
+## 部署到 EdgeOne Pages
+
+推送到 GitHub 的 `main` 即触发部署，仓库根目录的 `edgeone.json` 已经写好全部设置：
+
+| 配置项 | 值 |
+| --- | --- |
+| 根目录 | `./` |
+| 安装命令 | `node scripts/install-deps.mjs`（对两个子项目跑 `npm ci`） |
+| 构建命令 | `node scripts/build-pages.mjs` |
+| 输出目录 | `dist` |
+| Node 版本 | `22.11.0` |
+
+此外还有：
+
+- `redirects`：`/deepseek-v4.1-flash-0910`、`/deepseek-v4.1-flash-1017` 补结尾斜杠（301）
+- `rewrites`：两个版本目录的结尾斜杠地址显式映射到各自的 `index.html`，
+  不依赖平台对「目录 + index.html」的默认解析
+- `headers`：两版的 `assets/*`（文件名带 hash）设为一年强缓存
+- 构建脚本还会生成 `dist/404.html`：不存在的路径返回 404 页面，而不是静默回退到首页
+- 构建脚本还会生成 `dist/_build-info.json`：记录构建时间与 git commit，用来确认线上到底是哪次构建
+
+### 部署后自检
+
+```bash
+# 线上是哪一次构建（builtAt / gitCommit 应是本次提交）
+curl -s https://<域名>/_build-info.json
+
+# 应当返回各自的标题（不是同一个页面）
+curl -s https://<域名>/deepseek-v4.1-flash-0910/ | grep -o '<title>.*</title>'
+curl -s https://<域名>/deepseek-v4.1-flash-1017/ | grep -o '<title>.*</title>'
+
+# 0910 的纹理应该是真文件（image/jpeg），而不是回退的 HTML
+curl -sI https://<域名>/deepseek-v4.1-flash-0910/textures/sun.jpg | grep -i content-type
+
+# 不存在的路径应该 404
+curl -s -o /dev/null -w '%{http_code}\n' https://<域名>/no-such-path
+```
+
+如果 `/_build-info.json` 返回的还是 HTML（或 `gitCommit` 是旧的），说明**部署根本没有跑到最新提交**，
+先按下面的排障步骤查控制台，而不是改代码。
+
+### 排障：所有路径都显示新版首页
+
+按下面顺序查（都是控制台/构建侧，不是代码问题）：
+
+1. **EdgeOne 项目连的分支是不是 `main`**。如果项目还连在 `v4.1-flash-1017` 上，
+   推 `main` 不会触发部署，站点会一直停留在上一次成功部署的产物
+   （`Last-Modified` 会一直是那次部署的时间）。
+   可用 `edgeone makers link -n <项目名>` 确认项目存在，但 CLI **不能**给 GitHub 类型的
+   项目直接上传产物（会报 `Provider 'Github' ... does not support direct folder or zip file deployment`），
+   所以分支只能在控制台里改，或者改用「Upload」类型的新项目。
+2. **最近一次部署的时间**是否为本次推送之后，构建日志里是否出现
+   `[deepseek-v4.1-flash-0910] 构建 …`、`[deepseek-v4.1-flash-1017] 构建 …`、
+   `发布目录 dist/ 已就绪:`。
+3. 产物里没有 `deepseek-v4.1-flash-*` 目录时，平台会走 SPA 兜底：
+   **任何找不到的路径都返回根 `/index.html`（200）**，于是两个版本路径看起来都是新版，
+   不存在的路径也不会 404。用 `curl -sI /deepseek-v4.1-flash-0910/textures/sun.jpg`
+   看返回的是 `image/jpeg`（新产物）还是 `text/html`（兜底到首页）即可判断。
+4. 部署成功后如果仍是旧页面，去 EdgeOne 控制台刷新一下缓存（`index.html` 是
+   `max-age=0, must-revalidate`，正常情况下会自动回源校验）。
+
+### 关于包管理器
+
+- 仓库里保留的是两个子项目的 `pnpm-lock.yaml`，本地按 pnpm 工作流走。
+- 部署安装用 `npm`：EdgeOne 的构建环境一定带 npm，不依赖 pnpm 的具体版本。
+  两个子项目的 `package-lock.json` **都提交进了仓库**，部署时用 `npm ci` 按锁文件安装，
+  保证线上的依赖版本和本地验证过的一致（避免新发布的 vue-tsc / typescript 让构建突然失败）。
+  本地开发继续用 pnpm，`pnpm-lock.yaml` 也保留着；升级依赖时记得两边都更新一下。
+
+## 新增一个版本时的做法
+
+1. 把新项目放到 `deepseek-v4.1-flash-XXXX/`，确保它的 `vite.config.ts` 支持
+   `VITE_BASE` / `VITE_OUT_DIR`（参照现有两个项目）。
+2. 在 `scripts/build-pages.mjs` 的 `SITES` 数组里加一项（子路径即目录名）。
+3. 在 `edgeone.json` 里补一条 `rewrites`（结尾斜杠地址 → 该版 `index.html`）和一条
+   `redirects`（不带斜杠 → 带斜杠），补 `headers` 缓存规则同理。
+
+## 许可
+
+MIT，见 [LICENSE](./LICENSE)。

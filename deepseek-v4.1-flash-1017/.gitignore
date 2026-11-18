@@ -1,0 +1,11 @@
+node_modules/
+dist/
+shots/
+.verify/
+.npm-cache/
+.pnpm-home/
+*.local
+*.log
+.DS_Store
+Thumbs.db
+.vite/

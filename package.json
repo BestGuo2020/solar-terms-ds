@@ -1,30 +1,20 @@
 {
-  "name": "guanxiang-solar-terms",
+  "name": "jieqi-deepseek-sites",
   "private": true,
-  "version": "4.1.0",
+  "version": "1.0.0",
   "type": "module",
-  "description": "观象 · 二十四节气：以 Three.js 日地公转场景呈现节气、太阳黄经与四季的中文互动科普网站",
+  "description": "二十四节气多版本站点：0910 / 1017 两版合并发布到同一域名的不同子路径（EdgeOne Pages）",
   "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "dev": "vite --host 127.0.0.1 --port 5183",
-    "build": "vue-tsc --noEmit -p tsconfig.json && vite build",
-    "preview": "vite preview --host 127.0.0.1 --port 4180",
-    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
-    "verify:astro": "tsx scripts/verify-astro.mjs",
-    "verify:browser": "tsx scripts/verify-browser.mjs"
-  },
-  "dependencies": {
-    "astronomy-engine": "^2.1.19",
-    "three": "^0.170.0",
-    "vue": "^3.5.13"
-  },
-  "devDependencies": {
-    "@types/node": "^26.6.4",
-    "@types/three": "^0.170.0",
-    "@vitejs/plugin-vue": "^5.2.1",
-    "tsx": "^4.23.15",
-    "typescript": "^5.6.3",
-    "vite": "^6.0.7",
-    "vue-tsc": "^2.2.0"
+    "build": "node scripts/build-pages.mjs",
+    "build:0910": "node scripts/build-pages.mjs deepseek-v4.1-flash-0910",
+    "build:1017": "node scripts/build-pages.mjs deepseek-v4.1-flash-1017",
+    "dev:0910": "pnpm --dir deepseek-v4.1-flash-0910 dev",
+    "dev:1017": "pnpm --dir deepseek-v4.1-flash-1017 dev",
+    "preview": "node scripts/serve-dist.mjs",
+    "serve": "node scripts/serve-dist.mjs"
   }
 }

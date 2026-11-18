@@ -1,0 +1,89 @@
+{
+  "note": "本文件仅供开发期校验使用，不属于运行时数据。",
+  "sources": [
+    {
+      "name": "日本国立天文台 NAO 暦要項 2024（二十四節気）",
+      "url": "https://eco.mtk.nao.ac.jp/koyomi/yoko/2024/rekiyou242.html",
+      "timezone": "JST (UTC+9)",
+      "convertedTo": "UTC+8"
+    },
+    {
+      "name": "日本国立天文台 NAO 暦要項 2025（二十四節気）",
+      "url": "https://eco.mtk.nao.ac.jp/koyomi/yoko/2025/rekiyou252.html",
+      "timezone": "JST (UTC+9)",
+      "convertedTo": "UTC+8"
+    },
+    {
+      "name": "新华社 节令之美（旁证：2024年大雪 12月6日23时17分）",
+      "url": "http://big5.news.cn/gate/big5/tj.news.cn/20241205/e35e569331e54f8a9d0abdb6ebc2af99/c.html",
+      "timezone": "UTC+8",
+      "convertedTo": null
+    },
+    {
+      "name": "北京日报（旁证：2025年冬至 12月21日23时03分）",
+      "url": "https://xinwen.bjd.com.cn/content/s6948057ad5de1e4309afb86a.html",
+      "timezone": "UTC+8",
+      "convertedTo": null
+    }
+  ],
+  "years": {
+    "2024": {
+      "timezone": "UTC+8",
+      "terms": [
+        { "name": "小寒", "month": 1, "day": 6, "hour": 4, "minute": 49 },
+        { "name": "大寒", "month": 1, "day": 20, "hour": 22, "minute": 7 },
+        { "name": "立春", "month": 2, "day": 4, "hour": 16, "minute": 27 },
+        { "name": "雨水", "month": 2, "day": 19, "hour": 12, "minute": 13 },
+        { "name": "惊蛰", "month": 3, "day": 5, "hour": 10, "minute": 23 },
+        { "name": "春分", "month": 3, "day": 20, "hour": 11, "minute": 6 },
+        { "name": "清明", "month": 4, "day": 4, "hour": 15, "minute": 2 },
+        { "name": "谷雨", "month": 4, "day": 19, "hour": 22, "minute": 0 },
+        { "name": "立夏", "month": 5, "day": 5, "hour": 8, "minute": 10 },
+        { "name": "小满", "month": 5, "day": 20, "hour": 21, "minute": 0 },
+        { "name": "芒种", "month": 6, "day": 5, "hour": 12, "minute": 10 },
+        { "name": "夏至", "month": 6, "day": 21, "hour": 4, "minute": 51 },
+        { "name": "小暑", "month": 7, "day": 6, "hour": 22, "minute": 20 },
+        { "name": "大暑", "month": 7, "day": 22, "hour": 15, "minute": 44 },
+        { "name": "立秋", "month": 8, "day": 7, "hour": 8, "minute": 9 },
+        { "name": "处暑", "month": 8, "day": 22, "hour": 22, "minute": 55 },
+        { "name": "白露", "month": 9, "day": 7, "hour": 11, "minute": 11 },
+        { "name": "秋分", "month": 9, "day": 22, "hour": 20, "minute": 44 },
+        { "name": "寒露", "month": 10, "day": 8, "hour": 3, "minute": 0 },
+        { "name": "霜降", "month": 10, "day": 23, "hour": 6, "minute": 15 },
+        { "name": "立冬", "month": 11, "day": 7, "hour": 6, "minute": 20 },
+        { "name": "小雪", "month": 11, "day": 22, "hour": 3, "minute": 56 },
+        { "name": "大雪", "month": 12, "day": 6, "hour": 23, "minute": 17 },
+        { "name": "冬至", "month": 12, "day": 21, "hour": 17, "minute": 21 }
+      ]
+    },
+    "2025": {
+      "timezone": "UTC+8",
+      "terms": [
+        { "name": "小寒", "month": 1, "day": 5, "hour": 10, "minute": 33 },
+        { "name": "大寒", "month": 1, "day": 20, "hour": 4, "minute": 0 },
+        { "name": "立春", "month": 2, "day": 3, "hour": 22, "minute": 10 },
+        { "name": "雨水", "month": 2, "day": 18, "hour": 18, "minute": 7 },
+        { "name": "惊蛰", "month": 3, "day": 5, "hour": 16, "minute": 7 },
+        { "name": "春分", "month": 3, "day": 20, "hour": 17, "minute": 1 },
+        { "name": "清明", "month": 4, "day": 4, "hour": 20, "minute": 49 },
+        { "name": "谷雨", "month": 4, "day": 20, "hour": 3, "minute": 56 },
+        { "name": "立夏", "month": 5, "day": 5, "hour": 13, "minute": 57 },
+        { "name": "小满", "month": 5, "day": 21, "hour": 2, "minute": 55 },
+        { "name": "芒种", "month": 6, "day": 5, "hour": 17, "minute": 57 },
+        { "name": "夏至", "month": 6, "day": 21, "hour": 10, "minute": 42 },
+        { "name": "小暑", "month": 7, "day": 7, "hour": 4, "minute": 5 },
+        { "name": "大暑", "month": 7, "day": 22, "hour": 21, "minute": 29 },
+        { "name": "立秋", "month": 8, "day": 7, "hour": 13, "minute": 52 },
+        { "name": "处暑", "month": 8, "day": 23, "hour": 4, "minute": 34 },
+        { "name": "白露", "month": 9, "day": 7, "hour": 16, "minute": 52 },
+        { "name": "秋分", "month": 9, "day": 23, "hour": 2, "minute": 19 },
+        { "name": "寒露", "month": 10, "day": 8, "hour": 8, "minute": 41 },
+        { "name": "霜降", "month": 10, "day": 23, "hour": 11, "minute": 51 },
+        { "name": "立冬", "month": 11, "day": 7, "hour": 12, "minute": 4 },
+        { "name": "小雪", "month": 11, "day": 22, "hour": 9, "minute": 36 },
+        { "name": "大雪", "month": 12, "day": 7, "hour": 5, "minute": 5 },
+        { "name": "冬至", "month": 12, "day": 21, "hour": 23, "minute": 3 }
+      ]
+    }
+  }
+}

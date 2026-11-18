@@ -8,6 +8,10 @@ import type { MessageKey } from '../i18n/messages.ts'
 
 const { locale, t } = useI18n()
 
+// 站点可能挂在域名的子路径下（如 /deepseek-v4.1-flash-1017/），
+// 纹理目录属于 public/ 下的静态资源，必须跟随 base 而不是写死成 /textures/。
+const creditsHref = `${import.meta.env.BASE_URL}textures/CREDITS.md`
+
 const GROUP_ORDER: SourceRef['group'][] = ['历法与天文', '历史与非遗', '技术与图像']
 const GROUP_LABEL_KEYS: Record<SourceRef['group'], MessageKey> = {
   历法与天文: 'sources.group.calendar',
@@ -124,7 +128,7 @@ const supportedYears = computed(() => t('method.supportedYears'))
         </p>
         <p class="texture-credits__local">
           {{ t('sources.textureLocal') }}
-          <a href="/textures/CREDITS.md" target="_blank" rel="noopener">public/textures/CREDITS.md</a>
+          <a :href="creditsHref" target="_blank" rel="noopener">public/textures/CREDITS.md</a>
         </p>
       </div>
 
