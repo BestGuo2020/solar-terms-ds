@@ -131,7 +131,11 @@ curl -s -o /dev/null -w '%{http_code}\n' https://<域名>/no-such-path
 按下面顺序查（都是控制台/构建侧，不是代码问题）：
 
 1. **EdgeOne 项目连的分支是不是 `main`**。如果项目还连在 `v4.1-flash-1017` 上，
-   推 `main` 不会触发部署，站点会一直停留在上一次成功部署的产物。
+   推 `main` 不会触发部署，站点会一直停留在上一次成功部署的产物
+   （`Last-Modified` 会一直是那次部署的时间）。
+   可用 `edgeone makers link -n <项目名>` 确认项目存在，但 CLI **不能**给 GitHub 类型的
+   项目直接上传产物（会报 `Provider 'Github' ... does not support direct folder or zip file deployment`），
+   所以分支只能在控制台里改，或者改用「Upload」类型的新项目。
 2. **最近一次部署的时间**是否为本次推送之后，构建日志里是否出现
    `[deepseek-v4.1-flash-0910] 构建 …`、`[deepseek-v4.1-flash-1017] 构建 …`、
    `发布目录 dist/ 已就绪:`。
