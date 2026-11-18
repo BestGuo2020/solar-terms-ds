@@ -1,0 +1,38 @@
+{
+  "buildCommand": "node scripts/build-pages.mjs",
+  "installCommand": "npm install --prefix deepseek-v4.1-flash-0910 --include=dev --no-audit --no-fund && npm install --prefix deepseek-v4.1-flash-1017 --include=dev --no-audit --no-fund",
+  "outputDirectory": "dist",
+  "nodeVersion": "22.11.0",
+  "redirects": [
+    {
+      "source": "/deepseek-v4.1-flash-0910",
+      "destination": "/deepseek-v4.1-flash-0910/",
+      "statusCode": 301
+    },
+    {
+      "source": "/deepseek-v4.1-flash-1017",
+      "destination": "/deepseek-v4.1-flash-1017/",
+      "statusCode": 301
+    }
+  ],
+  "headers": [
+    {
+      "source": "/deepseek-v4.1-flash-0910/assets/*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/deepseek-v4.1-flash-1017/assets/*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ]
+}
