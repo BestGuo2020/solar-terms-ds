@@ -15,6 +15,16 @@
       "statusCode": 301
     }
   ],
+  "rewrites": [
+    {
+      "source": "/deepseek-v4.1-flash-0910/",
+      "destination": "/deepseek-v4.1-flash-0910/index.html"
+    },
+    {
+      "source": "/deepseek-v4.1-flash-1017/",
+      "destination": "/deepseek-v4.1-flash-1017/index.html"
+    }
+  ],
   "headers": [
     {
       "source": "/deepseek-v4.1-flash-0910/assets/*",

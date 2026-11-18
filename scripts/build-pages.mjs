@@ -103,6 +103,63 @@ async function writeRootHomepage(primary) {
   console.log(`\n根目录 dist/index.html ← ${primary.dir}/index.html`)
 }
 
+async function writeNotFoundPage() {
+  const cards = SITES.map(
+    (site) => `        <a class="card" href="/${site.dir}/">
+          <span class="path">/${site.dir}/</span>
+          <span class="desc">${site.label}</span>
+        </a>`,
+  ).join('\n')
+
+  const html = `<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>页面不存在 · 二十四节气</title>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0; min-height: 100vh; display: grid; place-items: center;
+        background: radial-gradient(circle at 30% 20%, #16233a, #050b12 60%);
+        color: #e9dfc9; font-family: system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      }
+      main { padding: 2rem; max-width: 34rem; }
+      .code { margin: 0; font-size: 3rem; letter-spacing: .1em; color: #d8b271; font-weight: 600; }
+      h1 { margin: .5rem 0 .25rem; font-size: 1.35rem; }
+      p.en { margin: 0 0 1.75rem; color: #93a2b8; font-size: .95rem; }
+      .cards { display: grid; gap: .6rem; }
+      .card {
+        display: flex; flex-direction: column; gap: .2rem; padding: .75rem .9rem;
+        border: 1px solid #24344c; border-radius: .6rem; text-decoration: none;
+        background: #0d1524cc; color: inherit;
+      }
+      .card:hover { border-color: #4a86b8; background: #12203a; }
+      .path { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9rem; color: #cfe0f3; }
+      .desc { font-size: .8rem; color: #93a2b8; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="code">404</p>
+      <h1>这个页面不存在</h1>
+      <p class="en">The page you are looking for does not exist.</p>
+      <div class="cards">
+        <a class="card" href="/">
+          <span class="path">/</span>
+          <span class="desc">新版首页 · 观象（1017）</span>
+        </a>
+${cards}
+      </div>
+    </main>
+  </body>
+</html>
+`
+  await writeFile(path.join(distDir, '404.html'), html, 'utf8')
+  console.log('404 页面 dist/404.html 已生成')
+}
+
 async function main() {
   const requested = process.argv.slice(2).filter((arg) => !arg.startsWith('-'))
 
@@ -137,6 +194,7 @@ async function main() {
   if (primary && sites.includes(primary)) {
     await writeRootHomepage(primary)
   }
+  await writeNotFoundPage()
 
   console.log('\n发布目录 dist/ 已就绪：')
   console.log('  /                               → ' + primary.dir)

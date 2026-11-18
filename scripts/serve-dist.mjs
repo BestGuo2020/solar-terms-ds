@@ -59,6 +59,13 @@ const server = createServer((request, response) => {
   const filePath = resolveTarget(request.url ?? '/')
 
   if (!filePath) {
+    // 和 EdgeOne 一致：产物里有 404.html 就返回它（状态码 404）
+    const notFound = path.join(rootDir, '404.html')
+    if (existsSync(notFound)) {
+      response.writeHead(404, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' })
+      createReadStream(notFound).pipe(response)
+      return
+    }
     response.writeHead(404, { 'content-type': 'text/html; charset=utf-8' })
     response.end(
       `<h1>404</h1><p>${request.url} 没有对应的文件。</p>` +

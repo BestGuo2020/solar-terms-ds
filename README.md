@@ -100,7 +100,37 @@ npm run preview      # http://127.0.0.1:4318
 此外还有：
 
 - `redirects`：`/deepseek-v4.1-flash-0910`、`/deepseek-v4.1-flash-1017` 补结尾斜杠（301）
+- `rewrites`：两个版本目录的结尾斜杠地址显式映射到各自的 `index.html`，
+  不依赖平台对「目录 + index.html」的默认解析
 - `headers`：两版的 `assets/*`（文件名带 hash）设为一年强缓存
+- 构建脚本还会生成 `dist/404.html`：不存在的路径返回 404 页面，而不是静默回退到首页
+
+### 部署后自检
+
+```bash
+# 应当返回各自的标题（不是同一个页面）
+curl -s https://<域名>/deepseek-v4.1-flash-0910/ | grep -o '<title>.*</title>'
+curl -s https://<域名>/deepseek-v4.1-flash-1017/ | grep -o '<title>.*</title>'
+
+# 0910 的纹理/脚本应该是真文件，而不是 HTML
+curl -sI https://<域名>/deepseek-v4.1-flash-0910/assets/<hash>.js
+```
+
+### 排障：所有路径都显示新版首页
+
+按下面顺序查（都是控制台/构建侧，不是代码问题）：
+
+1. **EdgeOne 项目连的分支是不是 `main`**。如果项目还连在 `v4.1-flash-1017` 上，
+   推 `main` 不会触发部署，站点会一直停留在上一次成功部署的产物。
+2. **最近一次部署的时间**是否为本次推送之后，构建日志里是否出现
+   `[deepseek-v4.1-flash-0910] 构建 …`、`[deepseek-v4.1-flash-1017] 构建 …`、
+   `发布目录 dist/ 已就绪:`。
+3. 产物里没有 `deepseek-v4.1-flash-*` 目录时，平台会走 SPA 兜底：
+   **任何找不到的路径都返回根 `/index.html`（200）**，于是两个版本路径看起来都是新版，
+   不存在的路径也不会 404。用 `curl -sI /deepseek-v4.1-flash-0910/textures/sun.jpg`
+   看返回的是 `image/jpeg`（新产物）还是 `text/html`（兜底到首页）即可判断。
+4. 部署成功后如果仍是旧页面，去 EdgeOne 控制台刷新一下缓存（`index.html` 是
+   `max-age=0, must-revalidate`，正常情况下会自动回源校验）。
 
 ### 关于包管理器
 
@@ -115,7 +145,8 @@ npm run preview      # http://127.0.0.1:4318
 1. 把新项目放到 `deepseek-v4.1-flash-XXXX/`，确保它的 `vite.config.ts` 支持
    `VITE_BASE` / `VITE_OUT_DIR`（参照现有两个项目）。
 2. 在 `scripts/build-pages.mjs` 的 `SITES` 数组里加一项（子路径即目录名）。
-3. 在 `edgeone.json` 里补一条结尾斜杠的 `redirects`（可选，补 `headers` 缓存规则同理）。
+3. 在 `edgeone.json` 里补一条 `rewrites`（结尾斜杠地址 → 该版 `index.html`）和一条
+   `redirects`（不带斜杠 → 带斜杠），补 `headers` 缓存规则同理。
 
 ## 许可
 
