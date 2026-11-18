@@ -87,7 +87,10 @@ npm run preview      # http://127.0.0.1:4318
 
 ## 部署到 EdgeOne Pages
 
-推送到 GitHub 的 `main` 即触发部署，仓库根目录的 `edgeone.json` 已经写好全部设置：
+EdgeOne 项目 `solar-terms-ds` 的 Production 环境跟踪 GitHub 的 `main`，并开启自动部署。
+在控制台的「域名管理」中，将 `solar-terms-ds.guoguo-labs.online` 的关联环境设为
+`Production`。这样推送 `main` 后，域名会指向 Production 最新的成功部署。
+在「构建部署配置」中将根目录设为 `./`，其余构建参数由仓库根目录的 `edgeone.json` 指定。
 
 | 配置项 | 值 |
 | --- | --- |
@@ -123,28 +126,16 @@ curl -sI https://<域名>/deepseek-v4.1-flash-0910/textures/sun.jpg | grep -i co
 curl -s -o /dev/null -w '%{http_code}\n' https://<域名>/no-such-path
 ```
 
-如果 `/_build-info.json` 返回的还是 HTML（或 `gitCommit` 是旧的），说明**部署根本没有跑到最新提交**，
-先按下面的排障步骤查控制台，而不是改代码。
+如果 `/_build-info.json` 返回 HTML，或 `gitCommit` 与本次推送不一致，先检查域名关联的环境和该环境的最新部署记录。
 
 ### 排障：所有路径都显示新版首页
 
-按下面顺序查（都是控制台/构建侧，不是代码问题）：
-
-1. **EdgeOne 项目连的分支是不是 `main`**。如果项目还连在 `v4.1-flash-1017` 上，
-   推 `main` 不会触发部署，站点会一直停留在上一次成功部署的产物
-   （`Last-Modified` 会一直是那次部署的时间）。
-   可用 `edgeone makers link -n <项目名>` 确认项目存在，但 CLI **不能**给 GitHub 类型的
-   项目直接上传产物（会报 `Provider 'Github' ... does not support direct folder or zip file deployment`），
-   所以分支只能在控制台里改，或者改用「Upload」类型的新项目。
-2. **最近一次部署的时间**是否为本次推送之后，构建日志里是否出现
-   `[deepseek-v4.1-flash-0910] 构建 …`、`[deepseek-v4.1-flash-1017] 构建 …`、
-   `发布目录 dist/ 已就绪:`。
-3. 产物里没有 `deepseek-v4.1-flash-*` 目录时，平台会走 SPA 兜底：
-   **任何找不到的路径都返回根 `/index.html`（200）**，于是两个版本路径看起来都是新版，
-   不存在的路径也不会 404。用 `curl -sI /deepseek-v4.1-flash-0910/textures/sun.jpg`
-   看返回的是 `image/jpeg`（新产物）还是 `text/html`（兜底到首页）即可判断。
-4. 部署成功后如果仍是旧页面，去 EdgeOne 控制台刷新一下缓存（`index.html` 是
-   `max-age=0, must-revalidate`，正常情况下会自动回源校验）。
+1. 在「域名管理」确认自定义域名关联到 **Production**。域名关联 Preview 时，访问的是
+   Preview 最近一次成功部署。若那次只发布了 1017，其 SPA 兜底就会把 0910 等未命中的路径也返回为 1017 首页。
+2. 在「设置 → 环境管理」确认 Production 关联 `main` 且自动部署已开启。
+   在「构建部署」确认本次提交的 Production 部署成功，产物中有两个版本目录和 `_build-info.json`。
+3. 使用上面的命令检查自定义域名。两版应返回各自的标题，0910 的纹理应返回 `image/jpeg`，
+   不存在的路径应返回 404。如果域名刚切换，等域名状态显示「已生效」后再测。
 
 ### 关于包管理器
 
