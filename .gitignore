@@ -31,3 +31,9 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 *.log
+
+# EdgeOne CLI 本地元数据与拉取的环境变量（edgeone makers link 生成）
+.edgeone/
+.env
+.env.local
+
