@@ -8,9 +8,8 @@ node_modules/
 # （里面包含两个子站的构建结果，子项目自己的 dist/ 也会被忽略）
 dist/
 
-# 部署安装用 npm（EdgeOne Pages），本地开发仍以 pnpm-lock.yaml 为准，
-# 不把 npm 生成的 lock 文件混进仓库
-package-lock.json
+# 部署安装用 npm（EdgeOne Pages）：package-lock.json 要提交，
+# 这样 `npm ci` 装到的版本和本地验证过的一致；本地开发仍以 pnpm-lock.yaml 为准
 
 # 类型检查缓存
 *.tsbuildinfo

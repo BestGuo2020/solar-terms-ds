@@ -17,7 +17,7 @@
  *   node scripts/build-pages.mjs deepseek-v4.1-flash-1017     只构建指定站点（构建产物不会互相覆盖）
  */
 
-import { spawn } from 'node:child_process'
+import { execSync, spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
@@ -160,6 +160,29 @@ ${cards}
   console.log('404 页面 dist/404.html 已生成')
 }
 
+async function writeBuildInfo() {
+  let gitCommit = 'unknown'
+  try {
+    gitCommit = execSync('git rev-parse --short HEAD', { cwd: rootDir, stdio: ['ignore', 'pipe', 'ignore'] })
+      .toString()
+      .trim()
+  } catch {
+    // 构建环境没有 git 也没关系，只是少了 commit 信息
+  }
+
+  const info = {
+    builtAt: new Date().toISOString(),
+    gitCommit,
+    sites: SITES.map((site) => ({
+      path: `/${site.dir}/`,
+      label: site.label,
+      primary: Boolean(site.primary),
+    })),
+  }
+  await writeFile(path.join(distDir, '_build-info.json'), JSON.stringify(info, null, 2) + '\n', 'utf8')
+  console.log(`构建信息 dist/_build-info.json：${gitCommit} @ ${info.builtAt}`)
+}
+
 async function main() {
   const requested = process.argv.slice(2).filter((arg) => !arg.startsWith('-'))
 
@@ -195,6 +218,7 @@ async function main() {
     await writeRootHomepage(primary)
   }
   await writeNotFoundPage()
+  await writeBuildInfo()
 
   console.log('\n发布目录 dist/ 已就绪：')
   console.log('  /                               → ' + primary.dir)

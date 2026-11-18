@@ -1,6 +1,6 @@
 {
   "buildCommand": "node scripts/build-pages.mjs",
-  "installCommand": "npm install --prefix deepseek-v4.1-flash-0910 --include=dev --no-audit --no-fund && npm install --prefix deepseek-v4.1-flash-1017 --include=dev --no-audit --no-fund",
+  "installCommand": "node scripts/install-deps.mjs",
   "outputDirectory": "dist",
   "nodeVersion": "22.11.0",
   "redirects": [

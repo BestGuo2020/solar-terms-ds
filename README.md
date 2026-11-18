@@ -92,7 +92,7 @@ npm run preview      # http://127.0.0.1:4318
 | 配置项 | 值 |
 | --- | --- |
 | 根目录 | `./` |
-| 安装命令 | `npm install --prefix` 分别安装两个子项目 |
+| 安装命令 | `node scripts/install-deps.mjs`（对两个子项目跑 `npm ci`） |
 | 构建命令 | `node scripts/build-pages.mjs` |
 | 输出目录 | `dist` |
 | Node 版本 | `22.11.0` |
@@ -104,17 +104,27 @@ npm run preview      # http://127.0.0.1:4318
   不依赖平台对「目录 + index.html」的默认解析
 - `headers`：两版的 `assets/*`（文件名带 hash）设为一年强缓存
 - 构建脚本还会生成 `dist/404.html`：不存在的路径返回 404 页面，而不是静默回退到首页
+- 构建脚本还会生成 `dist/_build-info.json`：记录构建时间与 git commit，用来确认线上到底是哪次构建
 
 ### 部署后自检
 
 ```bash
+# 线上是哪一次构建（builtAt / gitCommit 应是本次提交）
+curl -s https://<域名>/_build-info.json
+
 # 应当返回各自的标题（不是同一个页面）
 curl -s https://<域名>/deepseek-v4.1-flash-0910/ | grep -o '<title>.*</title>'
 curl -s https://<域名>/deepseek-v4.1-flash-1017/ | grep -o '<title>.*</title>'
 
-# 0910 的纹理/脚本应该是真文件，而不是 HTML
-curl -sI https://<域名>/deepseek-v4.1-flash-0910/assets/<hash>.js
+# 0910 的纹理应该是真文件（image/jpeg），而不是回退的 HTML
+curl -sI https://<域名>/deepseek-v4.1-flash-0910/textures/sun.jpg | grep -i content-type
+
+# 不存在的路径应该 404
+curl -s -o /dev/null -w '%{http_code}\n' https://<域名>/no-such-path
 ```
+
+如果 `/_build-info.json` 返回的还是 HTML（或 `gitCommit` 是旧的），说明**部署根本没有跑到最新提交**，
+先按下面的排障步骤查控制台，而不是改代码。
 
 ### 排障：所有路径都显示新版首页
 
@@ -135,10 +145,10 @@ curl -sI https://<域名>/deepseek-v4.1-flash-0910/assets/<hash>.js
 ### 关于包管理器
 
 - 仓库里保留的是两个子项目的 `pnpm-lock.yaml`，本地按 pnpm 工作流走。
-- 部署安装用 `npm`：EdgeOne 的构建环境一定带 npm，不依赖 pnpm 的具体版本；
-  npm 生成的 `package-lock.json` 已在 `.gitignore` 中忽略。
-  如果你更希望部署也用 pnpm（可复现安装），把 `edgeone.json` 的 `installCommand`
-  换成 `pnpm install --dir deepseek-v4.1-flash-0910 && pnpm install --dir deepseek-v4.1-flash-1017` 即可。
+- 部署安装用 `npm`：EdgeOne 的构建环境一定带 npm，不依赖 pnpm 的具体版本。
+  两个子项目的 `package-lock.json` **都提交进了仓库**，部署时用 `npm ci` 按锁文件安装，
+  保证线上的依赖版本和本地验证过的一致（避免新发布的 vue-tsc / typescript 让构建突然失败）。
+  本地开发继续用 pnpm，`pnpm-lock.yaml` 也保留着；升级依赖时记得两边都更新一下。
 
 ## 新增一个版本时的做法
 
